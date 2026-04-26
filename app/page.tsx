@@ -1045,6 +1045,86 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
+
+        {/* === FOOTER === */}
+        <footer className="relative border-t border-white/10 bg-[#07111A]/60 backdrop-blur-md mt-12">
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[700px] h-[300px] bg-[#22D3B0]/8 blur-[140px] rounded-full"></div>
+          </div>
+
+          <div className="max-w-[1280px] mx-auto px-6 lg:px-12 py-14 relative">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8 mb-10">
+
+              {/* עמודה 1: לוגו + תיאור */}
+              <div className="text-center md:text-right">
+                <div className="flex items-center gap-3 mb-4 justify-center md:justify-start">
+                  <div className="relative w-10 h-10">
+                    <Image src="/spike-mascot.png" alt="Spike AI" fill className="object-contain mix-blend-screen" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl font-bold">Spike AI</span>
+                    <span className="text-[10px] font-bold tracking-widest text-[#5EEAD4] bg-[#14B8A6]/15 border border-[#14B8A6]/30 px-2 py-0.5 rounded-full">
+                      AGENTS
+                    </span>
+                  </div>
+                </div>
+                <p className="text-sm text-white/60 leading-relaxed max-w-xs mx-auto md:mx-0">
+                  צוות שעובד בשבילך, בלי לבקש משכורת.
+                </p>
+              </div>
+
+              {/* עמודה 2: קישורים */}
+              <div className="text-center md:text-right">
+                <h4 className="text-sm font-bold text-white/90 mb-4 tracking-wide">ניווט</h4>
+                <ul className="space-y-2.5">
+                  <li>
+                    <a href="#how" className="text-sm text-white/60 hover:text-[#5EEAD4] transition-colors">
+                      איך זה עובד
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#agents" className="text-sm text-white/60 hover:text-[#5EEAD4] transition-colors">
+                      סוכנים
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#pricing" className="text-sm text-white/60 hover:text-[#5EEAD4] transition-colors">
+                      החבילה
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#faq" className="text-sm text-white/60 hover:text-[#5EEAD4] transition-colors">
+                      שאלות נפוצות
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
+              {/* עמודה 3: יצירת קשר */}
+              <div className="text-center md:text-right">
+                <h4 className="text-sm font-bold text-white/90 mb-4 tracking-wide">יצירת קשר</h4>
+                <a
+                  href="mailto:spikeaistudio@gmail.com"
+                  className="inline-flex items-center gap-2 text-sm text-white/60 hover:text-[#5EEAD4] transition-colors"
+                  dir="ltr"
+                >
+                  <span>spikeaistudio@gmail.com</span>
+                </a>
+                <p className="text-xs text-white/40 mt-3 leading-relaxed">
+                  נחזור אליך תוך 24 שעות
+                </p>
+              </div>
+
+            </div>
+
+            {/* שורת copyright */}
+            <div className="pt-8 border-t border-white/5 text-center">
+              <p className="text-xs text-white/40">
+                © 2026 Spike AI Agents. כל הזכויות שמורות.
+              </p>
+            </div>
+          </div>
+        </footer>
       </div>
     </>
   );
