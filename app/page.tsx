@@ -598,6 +598,53 @@ export default function LandingPage() {
           font-size: 14px;
           text-align: center;
         }
+
+        /* === EXPLAINER VIDEO === */
+        .video-wrapper {
+          position: relative;
+          border-radius: 24px;
+          overflow: hidden;
+          background: linear-gradient(135deg, rgba(34, 211, 176, 0.15), rgba(91, 208, 242, 0.1));
+          padding: 6px;
+          box-shadow:
+            0 0 60px rgba(34, 211, 176, 0.25),
+            0 20px 40px rgba(0, 0, 0, 0.4),
+            inset 0 0 0 1px rgba(94, 234, 212, 0.2);
+          transition: box-shadow 0.4s ease;
+        }
+        .video-wrapper:hover {
+          box-shadow:
+            0 0 80px rgba(34, 211, 176, 0.4),
+            0 25px 50px rgba(0, 0, 0, 0.5),
+            inset 0 0 0 1px rgba(94, 234, 212, 0.4);
+        }
+        .video-wrapper video {
+          display: block;
+          width: 100%;
+          height: auto;
+          border-radius: 18px;
+          background: #07111A;
+          aspect-ratio: 16 / 9;
+        }
+        .video-wrapper::before {
+          content: '';
+          position: absolute;
+          inset: -2px;
+          border-radius: 26px;
+          padding: 2px;
+          background: linear-gradient(135deg, #22D3B0, #5BD0F2, #22D3B0);
+          background-size: 200% 200%;
+          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          -webkit-mask-composite: xor;
+          mask-composite: exclude;
+          opacity: 0.6;
+          animation: video-border-shimmer 6s ease infinite;
+          pointer-events: none;
+        }
+        @keyframes video-border-shimmer {
+          0%, 100% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+        }
         
         /* === צ'קבוקסים להסכמה משפטית === */
         .consent-checkbox-wrapper {
@@ -714,6 +761,7 @@ export default function LandingPage() {
             </div>
 
             <div className="hidden md:flex items-center gap-8">
+              <a href="#video" className="text-sm text-white/70 hover:text-white transition">סרטון</a>
               <a href="#how" className="text-sm text-white/70 hover:text-white transition">איך זה עובד</a>
               <a href="#agents" className="text-sm text-white/70 hover:text-white transition">סוכנים</a>
               <a href="#pricing" className="text-sm text-white/70 hover:text-white transition">החבילה</a>
@@ -804,6 +852,38 @@ export default function LandingPage() {
                   <span className="flex items-center gap-1.5"><span className="text-[#5EEAD4] font-bold">✓</span>עברית מלאה</span>
                 </div>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* === EXPLAINER VIDEO === */}
+        <section id="video" className="relative pt-8 pb-12 lg:pt-10 lg:pb-16 px-6 lg:px-12">
+          <div className="max-w-[1100px] mx-auto relative">
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center gap-2 bg-[#22D3B0]/10 border border-[#22D3B0]/30 rounded-full px-4 py-2 mb-4 text-sm text-[#5EEAD4]">
+                <span>▶</span>
+                <span>צפה בפעולה</span>
+              </div>
+              <h2 className="text-2xl lg:text-4xl font-black leading-[1.1] tracking-tight mb-3">
+                ראה את הסוכנים{" "}
+                <span className="shimmer-text">בפעולה</span>
+              </h2>
+              <p className="text-sm lg:text-base text-white/70">
+                60 שניות שמסבירות הכל. מה הם עושים, איך הם עובדים, ואיך זה משנה את היום שלך.
+              </p>
+            </div>
+
+            <div className="video-wrapper">
+              <video
+                controls
+                preload="metadata"
+                playsInline
+                poster="/video-poster.jpg"
+                className="w-full rounded-2xl"
+              >
+                <source src="/spike-explainer.mp4" type="video/mp4" />
+                הדפדפן שלך לא תומך בנגן וידאו.
+              </video>
             </div>
           </div>
         </section>
