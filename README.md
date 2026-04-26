@@ -1,98 +1,159 @@
 # 🤖 Spike AI Agents
 
-> Done-For-You AI agents that work 24/7 for Israeli businesses.
+> סוכני AI מותאמים לעסקים ישראליים - בלי לבקש משכורת.
 
-A premium B2B landing page for Spike AI Agents — a service that provides custom AI agents to Israeli business owners. Agents send daily reports to Telegram, manage social media, monitor reviews, and more.
+דף נחיתה פרימיום בעברית B2B עבור Spike AI Agents — שירות Done-For-You שמספק חבילת סוכני AI לעסקים. הסוכנים עובדים 24/7, סורקים את הדאטה של העסק, ושולחים דוחות לטלגרם.
 
-## 🚀 Features
+---
 
-- ✨ Premium glassmorphism design with teal gradient theme
-- 🇮🇱 Full Hebrew RTL support
-- 📱 Fully responsive (mobile, tablet, desktop)
-- ⚡ Two lead capture forms (Hero quick form + Detailed form)
-- 🎨 Custom mascot integration with multi-layer glow effects
-- 📧 Web3Forms email integration for lead delivery
-- 🎯 9 AI agent showcase
-- 💎 Premium package section
-- ❓ Interactive FAQ accordion
+## 🚀 פיצ'רים
 
-## 🛠️ Tech Stack
+- ✨ עיצוב פרימיום עם glassmorphism וגרדיאנט טורקיז
+- 🇮🇱 תמיכה מלאה בעברית RTL
+- 📱 רספונסיבי מלא (מובייל, טאבלט, מחשב)
+- ⚡ 2 טפסים ללכידת לידים (מהיר ב-Hero + מפורט בסוף)
+- 🤖 9 סוכני AI מוצגים בכרטיסים
+- 💎 עמודת חבילה פרימיום עם אנימציות
+- ❓ FAQ אינטראקטיבי (accordion)
+- 📧 חיבור ל-Web3Forms לקבלת לידים במייל
 
-- **Framework:** Next.js 16 with App Router
+---
+
+## 📚 תיעוד מלא
+
+הפרויקט מתועד ברמה מקצועית בתיקיית `/docs`:
+
+| מסמך | מה יש בו |
+|---|---|
+| 📘 [`PROJECT-OVERVIEW.md`](./docs/PROJECT-OVERVIEW.md) | סקירה כללית, מודל עסקי, קהל יעד |
+| 🎨 [`DESIGN-SYSTEM.md`](./docs/DESIGN-SYSTEM.md) | פלטת צבעים, גופנים, אנימציות |
+| ✍️ [`COPY-GUIDE.md`](./docs/COPY-GUIDE.md) | כל הטקסטים בדף + הסבר למה |
+| 🏗️ [`ARCHITECTURE.md`](./docs/ARCHITECTURE.md) | מבנה הקוד, איך הכל מחובר |
+| 📋 [`DECISIONS-LOG.md`](./docs/DECISIONS-LOG.md) | החלטות שעשינו ולמה |
+
+> **למפתחים חדשים / Claude session חדש:** התחל מ-`PROJECT-OVERVIEW.md`!
+
+---
+
+## 🛠️ Stack טכנולוגי
+
+- **Framework:** Next.js 16 (App Router)
 - **Language:** TypeScript
 - **Styling:** Tailwind CSS v4
+- **Build:** Turbopack
 - **Font:** Heebo (Google Fonts)
-- **Forms:** Web3Forms
-- **Animations:** Custom CSS keyframes
+- **Forms:** Web3Forms API
 
-## 📁 Project Structure
+---
+
+## 🏃 הרצה מקומית
+
+```bash
+# התקנת חבילות (פעם ראשונה)
+npm install
+
+# שרת פיתוח
+npm run dev
+
+# פתיחה בדפדפן
+http://localhost:3000
+```
+
+---
+
+## 📦 Build לפרודקשן
+
+```bash
+npm run build
+npm start
+```
+
+---
+
+## 🎨 פלטת צבעים מהירה
+
+```css
+--spike-teal:        #22D3B0  /* ראשי */
+--spike-cyan:        #5BD0F2  /* משלים */
+--spike-light-teal:  #5EEAD4  /* בהיר */
+--spike-deep-teal:   #14B8A6  /* עמוק */
+--bg-primary:        #07111A  /* רקע */
+```
+
+---
+
+## 📁 מבנה תיקיות
 
 ```
 spike-agents/
 ├── app/
-│   ├── page.tsx          # Main landing page
-│   ├── layout.tsx        # Root layout with RTL setup
-│   └── globals.css       # Global styles
+│   ├── page.tsx              # דף ראשי (כל הסקציות)
+│   ├── layout.tsx            # RTL + Heebo
+│   └── globals.css           # Tailwind v4
 ├── public/
-│   ├── spike-mascot.png      # Original mascot (logo)
-│   └── spike-mascot-pro.png  # Pro mascot (Hero)
+│   ├── spike-mascot.png      # מסקוט קטן
+│   └── spike-mascot-pro.png  # מסקוט גדול (Hero)
+├── docs/                     # תיעוד מלא
+│   ├── PROJECT-OVERVIEW.md
+│   ├── DESIGN-SYSTEM.md
+│   ├── COPY-GUIDE.md
+│   ├── ARCHITECTURE.md
+│   └── DECISIONS-LOG.md
 └── package.json
 ```
 
-## 🏃 Local Development
+---
 
-```bash
-# Install dependencies
-npm install
+## 🤖 9 הסוכנים
 
-# Run dev server
-npm run dev
-
-# Open browser
-http://localhost:3000
-```
-
-## 📦 Build & Deploy
-
-```bash
-# Production build
-npm run build
-
-# Start production server
-npm start
-```
-
-## 🎨 Design System
-
-- **Primary:** `#22D3B0` (teal)
-- **Secondary:** `#5BD0F2` (cyan)
-- **Accent:** `#5EEAD4` (light teal)
-- **Deep:** `#14B8A6` (deep teal)
-- **Background:** `#07111A` (dark navy)
-
-## 📧 Lead Forms
-
-Both forms (Hero quick + Detailed) are connected to Web3Forms and send leads directly to email.
-
-- **Hero Form:** Name, Phone, Email
-- **Detailed Form:** Name, Phone, Email, Business Type (16 options)
-
-## 🤖 The 9 Agents
-
-1. ☀️ Morning Agent - Daily Telegram report at 7:00
-2. 📱 Social Agent - 3 posts/day ready
-3. 🧠 Manager Agent - Strategic daily summary
-4. 🎯 Watcher Agent - Real-time alerts
-5. 🧹 Cleanup Agent - Pipeline maintenance
-6. 💰 Sales Agent - Deal analysis
-7. ⭐ Reviews Agent - Google + Instagram monitoring
-8. 📦 Inventory Agent - Demand forecasting
-9. 🔥 Hot Leads Agent - Smart lead scoring
-
-## 📝 License
-
-Private — All rights reserved © 2026 Spike AI
+| # | סוכן | מה עושה |
+|---|---|---|
+| ☀️ | סוכן בוקר | דוח יומי בטלגרם ב-7:00 |
+| 📱 | סוכן רשתות | 3 פוסטים מוכנים בכל יום |
+| 🧠 | סוכן מנהל | סיכום אסטרטגי יומי |
+| 🎯 | סוכן מעקב | התראות בזמן אמת |
+| 🧹 | סוכן ניקיון | pipeline נקי תמיד |
+| 💰 | סוכן מכירות | מנתח deals תקועים |
+| ⭐ | סוכן ביקורות | סורק ומגיב לביקורות |
+| 📦 | סוכן מלאי | חיזוי ביקוש |
+| 🔥 | סוכן לידים חמים | דירוג חכם של לידים |
 
 ---
 
-**Status:** 🟢 In active development (stealth mode)
+## 📧 לידים
+
+שני הטפסים מחוברים ל-**Web3Forms** ושולחים את הלידים ישירות למייל.
+
+- **טופס Hero (מהיר):** שם, טלפון, אימייל
+- **טופס מפורט:** שם, טלפון, אימייל, תחום עסק (16 אפשרויות)
+
+---
+
+## 🚧 סטטוס
+
+🟢 **בפיתוח פעיל** (stealth mode)
+
+### מה מוכן ✅
+- Hero, How It Works, Agents, Package, Forms, FAQ
+- שני המסקוטים מוטמעים
+- חיבור Web3Forms פעיל
+- עיצוב פרימיום מלא
+- RTL מלא
+
+### מה הלאה 🔮
+- Footer
+- חיבור לבוט טלגרם
+- דומיין משלו
+- Deploy ל-Vercel
+- Analytics
+
+---
+
+## 📝 רישיון
+
+Private — All rights reserved © 2026 Spike AI Agents
+
+---
+
+**Maintainer:** Dean Moshe ([@DinSpikeAI](https://github.com/DinSpikeAI))
+**Last updated:** April 2026
