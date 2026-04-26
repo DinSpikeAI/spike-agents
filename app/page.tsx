@@ -604,7 +604,7 @@ export default function LandingPage() {
           <div className="max-w-[1280px] mx-auto px-6 lg:px-12 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="relative w-10 h-10">
-                <Image src="/spike-mascot.png" alt="Spike AI" fill className="object-contain mix-blend-screen" />
+                <Image src="/spike-mascot.png" alt="Spike AI" fill sizes="40px" className="object-contain mix-blend-screen" />
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xl font-bold">Spike AI</span>
@@ -1059,7 +1059,7 @@ export default function LandingPage() {
               <div className="text-center md:text-right">
                 <div className="flex items-center gap-3 mb-4 justify-center md:justify-start">
                   <div className="relative w-10 h-10">
-                    <Image src="/spike-mascot.png" alt="Spike AI" fill className="object-contain mix-blend-screen" />
+                    <Image src="/spike-mascot.png" alt="Spike AI" fill sizes="40px" className="object-contain mix-blend-screen" />
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-xl font-bold">Spike AI</span>
