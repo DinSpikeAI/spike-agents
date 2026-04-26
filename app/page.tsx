@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 
 const WEB3FORMS_KEY = "0b0d2e56-49e7-443f-b4bc-444c083b01ac";
@@ -1053,7 +1054,7 @@ export default function LandingPage() {
           </div>
 
           <div className="max-w-[1280px] mx-auto px-6 lg:px-12 py-14 relative">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8 mb-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-8 mb-10">
 
               {/* עמודה 1: לוגו + תיאור */}
               <div className="text-center md:text-right">
@@ -1073,7 +1074,7 @@ export default function LandingPage() {
                 </p>
               </div>
 
-              {/* עמודה 2: קישורים */}
+              {/* עמודה 2: ניווט */}
               <div className="text-center md:text-right">
                 <h4 className="text-sm font-bold text-white/90 mb-4 tracking-wide">ניווט</h4>
                 <ul className="space-y-2.5">
@@ -1100,7 +1101,34 @@ export default function LandingPage() {
                 </ul>
               </div>
 
-              {/* עמודה 3: יצירת קשר */}
+              {/* עמודה 3: מידע משפטי */}
+              <div className="text-center md:text-right">
+                <h4 className="text-sm font-bold text-white/90 mb-4 tracking-wide">מידע משפטי</h4>
+                <ul className="space-y-2.5">
+                  <li>
+                    <Link href="/privacy" className="text-sm text-white/60 hover:text-[#5EEAD4] transition-colors">
+                      מדיניות פרטיות
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/terms" className="text-sm text-white/60 hover:text-[#5EEAD4] transition-colors">
+                      תנאי שימוש
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/cookies" className="text-sm text-white/60 hover:text-[#5EEAD4] transition-colors">
+                      מדיניות עוגיות
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/accessibility" className="text-sm text-white/60 hover:text-[#5EEAD4] transition-colors">
+                      הצהרת נגישות
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+
+              {/* עמודה 4: יצירת קשר */}
               <div className="text-center md:text-right">
                 <h4 className="text-sm font-bold text-white/90 mb-4 tracking-wide">יצירת קשר</h4>
                 <a
