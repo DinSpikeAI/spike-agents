@@ -6,6 +6,9 @@ import { useState } from "react";
 
 const WEB3FORMS_KEY = "0b0d2e56-49e7-443f-b4bc-444c083b01ac";
 
+// גרסת המדיניות שהליד ראה בעת ההסכמה - לעדכן בכל שינוי מהותי במדיניות הפרטיות/תנאי השימוש
+const POLICY_VERSION = "1.0";
+
 const agents = [
   {
     icon: "☀️",
@@ -141,6 +144,8 @@ export default function LandingPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [agreedToMarketing, setAgreedToMarketing] = useState(false);
 
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
@@ -167,6 +172,14 @@ export default function LandingPage() {
           submission_time: new Date().toLocaleString("he-IL", {
             timeZone: "Asia/Jerusalem",
           }),
+          // תיעוד הסכמה פסיבית (לחיצה על הכפתור = הסכמה למדיניות + תנאי שימוש)
+          consent_type: "implicit (button click)",
+          consent_privacy_terms: "כן ✓ (בלחיצה על הכפתור)",
+          consent_marketing: "לא נשאל בטופס המהיר",
+          policy_version: POLICY_VERSION,
+          consent_timestamp_iso: new Date().toISOString(),
+          consent_page_url: typeof window !== "undefined" ? window.location.href : "",
+          consent_user_agent: typeof navigator !== "undefined" ? navigator.userAgent : "",
         }),
       });
 
@@ -214,6 +227,13 @@ export default function LandingPage() {
           submission_time: new Date().toLocaleString("he-IL", {
             timeZone: "Asia/Jerusalem",
           }),
+          // תיעוד הסכמה משפטי (תיקון 13 לחוק הגנת הפרטיות)
+          consent_privacy_terms: agreedToTerms ? "כן ✓" : "לא ✗",
+          consent_marketing: agreedToMarketing ? "כן ✓" : "לא ✗",
+          policy_version: POLICY_VERSION,
+          consent_timestamp_iso: new Date().toISOString(),
+          consent_page_url: typeof window !== "undefined" ? window.location.href : "",
+          consent_user_agent: typeof navigator !== "undefined" ? navigator.userAgent : "",
         }),
       });
 
@@ -578,6 +598,84 @@ export default function LandingPage() {
           font-size: 14px;
           text-align: center;
         }
+        
+        /* === צ'קבוקסים להסכמה משפטית === */
+        .consent-checkbox-wrapper {
+          display: flex;
+          align-items: flex-start;
+          gap: 10px;
+          padding: 10px 0;
+          cursor: pointer;
+          user-select: none;
+          transition: opacity 0.2s ease;
+        }
+        .consent-checkbox-wrapper:hover {
+          opacity: 0.9;
+        }
+        .consent-checkbox-input {
+          appearance: none;
+          -webkit-appearance: none;
+          width: 18px;
+          height: 18px;
+          min-width: 18px;
+          margin-top: 2px;
+          border: 2px solid rgba(255, 255, 255, 0.3);
+          border-radius: 4px;
+          background: rgba(255, 255, 255, 0.05);
+          cursor: pointer;
+          position: relative;
+          transition: all 0.2s ease;
+          flex-shrink: 0;
+        }
+        .consent-checkbox-input:hover {
+          border-color: rgba(34, 211, 176, 0.5);
+        }
+        .consent-checkbox-input:checked {
+          background: linear-gradient(135deg, #22D3B0 0%, #5BD0F2 100%);
+          border-color: #22D3B0;
+        }
+        .consent-checkbox-input:checked::after {
+          content: '✓';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          color: #07111A;
+          font-weight: 900;
+          font-size: 13px;
+          line-height: 1;
+        }
+        .consent-checkbox-input:focus-visible {
+          outline: 2px solid #22D3B0;
+          outline-offset: 2px;
+        }
+        .consent-checkbox-label {
+          font-size: 13px;
+          line-height: 1.5;
+          color: rgba(255, 255, 255, 0.7);
+          flex: 1;
+        }
+        .consent-checkbox-label a {
+          color: #5EEAD4;
+          text-decoration: underline;
+          text-underline-offset: 2px;
+          transition: color 0.2s ease;
+        }
+        .consent-checkbox-label a:hover {
+          color: #22D3B0;
+        }
+        .consent-required-indicator {
+          color: #fca5a5;
+          font-weight: 600;
+          font-size: 11px;
+          margin-right: 4px;
+        }
+        .consent-optional-indicator {
+          color: rgba(255, 255, 255, 0.4);
+          font-weight: 500;
+          font-size: 11px;
+          margin-right: 4px;
+        }
       `}</style>
 
       <div dir="rtl" className="min-h-screen bg-[#07111A] text-white overflow-x-hidden relative">
@@ -671,6 +769,7 @@ export default function LandingPage() {
                       <input type="tel" name="phone" value={heroForm.phone} onChange={handleHeroChange} placeholder="טלפון" required className="hero-quick-input" />
                     </div>
                     <input type="email" name="email" value={heroForm.email} onChange={handleHeroChange} placeholder="אימייל" required className="hero-quick-input" />
+
                     {heroError && (
                       <div className="error-message">⚠️ {heroError}</div>
                     )}
@@ -679,6 +778,12 @@ export default function LandingPage() {
                     </button>
                     <p className="text-xs text-white/50 text-center">
                       ⚡ נחזור אליך תוך 24 שעות. בלי התחייבות.
+                    </p>
+                    <p className="text-[11px] text-white/40 text-center leading-relaxed mt-2">
+                      בלחיצה על &quot;קבל הצעה אישית&quot; אני מסכים/ה ל
+                      <Link href="/privacy" target="_blank" rel="noopener" className="text-white/60 hover:text-[#5EEAD4] underline underline-offset-2">מדיניות הפרטיות</Link>
+                      {" "}ול
+                      <Link href="/terms" target="_blank" rel="noopener" className="text-white/60 hover:text-[#5EEAD4] underline underline-offset-2">תנאי השימוש</Link>.
                     </p>
                   </form>
                 ) : (
@@ -954,11 +1059,45 @@ export default function LandingPage() {
                       </select>
                     </div>
 
+                    {/* === צ'קבוקסי הסכמה משפטית === */}
+                    <div className="space-y-1 pt-2">
+                      <label className="consent-checkbox-wrapper">
+                        <input
+                          type="checkbox"
+                          checked={agreedToTerms}
+                          onChange={(e) => setAgreedToTerms(e.target.checked)}
+                          required
+                          className="consent-checkbox-input"
+                        />
+                        <span className="consent-checkbox-label">
+                          <span className="consent-required-indicator">חובה</span>
+                          קראתי את{" "}
+                          <Link href="/privacy" target="_blank" rel="noopener">מדיניות הפרטיות</Link>
+                          {" "}ואת{" "}
+                          <Link href="/terms" target="_blank" rel="noopener">תנאי השימוש</Link>
+                          {" "}ואני מסכים/ה להם.
+                        </span>
+                      </label>
+
+                      <label className="consent-checkbox-wrapper">
+                        <input
+                          type="checkbox"
+                          checked={agreedToMarketing}
+                          onChange={(e) => setAgreedToMarketing(e.target.checked)}
+                          className="consent-checkbox-input"
+                        />
+                        <span className="consent-checkbox-label">
+                          <span className="consent-optional-indicator">אופציונלי</span>
+                          אני מאשר/ת לקבל חומר שיווקי, עדכונים והצעות בדוא&quot;ל ובהודעות.
+                        </span>
+                      </label>
+                    </div>
+
                     {submitError && (
                       <div className="error-message">⚠️ {submitError}</div>
                     )}
 
-                    <button type="submit" disabled={isSubmitting} className="w-full bg-gradient-to-l from-[#22D3B0] to-[#5BD0F2] text-[#07111A] font-black px-8 py-5 rounded-xl text-lg shadow-lg shadow-[#22D3B0]/40 hover:shadow-xl hover:shadow-[#22D3B0]/60 hover:scale-[1.02] transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100">
+                    <button type="submit" disabled={isSubmitting || !agreedToTerms} className="w-full bg-gradient-to-l from-[#22D3B0] to-[#5BD0F2] text-[#07111A] font-black px-8 py-5 rounded-xl text-lg shadow-lg shadow-[#22D3B0]/40 hover:shadow-xl hover:shadow-[#22D3B0]/60 hover:scale-[1.02] transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100">
                       {isSubmitting ? "שולח..." : "שלח ובוא נדבר"}
                     </button>
 
