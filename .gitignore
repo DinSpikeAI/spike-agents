@@ -41,3 +41,12 @@ next-env.d.ts
 # OS
 Thumbs.db
 desktop.ini
+
+# Explainer video source files (keep local only)
+/explainer/
+/spike-explainer-final2.mp4
+/spike-explainer-final.mp4
+/Recording*.mp4
+
+# Personal files
+/הדברים החשובים !/
