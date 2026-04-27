@@ -148,6 +148,7 @@ export default function LandingPage() {
   const [agreedToMarketing, setAgreedToMarketing] = useState(false);
 
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleHeroSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -553,17 +554,23 @@ export default function LandingPage() {
         }
         .faq-button {
           width: 100%;
-          padding: 24px 28px;
+          padding: 18px 20px;
           text-align: right;
           display: flex;
           justify-content: space-between;
           align-items: center;
-          gap: 16px;
+          gap: 12px;
           cursor: pointer;
           background: transparent;
           border: none;
           color: white;
           font-family: inherit;
+        }
+        @media (min-width: 640px) {
+          .faq-button {
+            padding: 24px 28px;
+            gap: 16px;
+          }
         }
         .faq-icon {
           width: 32px;
@@ -583,10 +590,15 @@ export default function LandingPage() {
           transform: rotate(45deg);
         }
         .faq-answer {
-          padding: 0 28px 24px 28px;
+          padding: 0 20px 20px 20px;
           color: rgba(255, 255, 255, 0.75);
           line-height: 1.7;
           animation: spike-faq-fade-in 0.3s ease;
+        }
+        @media (min-width: 640px) {
+          .faq-answer {
+            padding: 0 28px 24px 28px;
+          }
         }
         
         .error-message {
@@ -747,14 +759,14 @@ export default function LandingPage() {
         </div>
 
         <nav className="sticky top-0 z-50 backdrop-blur-md bg-[#07111A]/70 border-b border-white/5">
-          <div className="max-w-[1280px] mx-auto px-6 lg:px-12 py-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="relative w-10 h-10">
+          <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-12 py-3 sm:py-4 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+              <div className="relative w-8 h-8 sm:w-10 sm:h-10">
                 <Image src="/spike-mascot.png" alt="Spike AI" fill sizes="40px" className="object-contain mix-blend-screen" />
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-xl font-bold">Spike AI</span>
-                <span className="text-[10px] font-bold tracking-widest text-[#5EEAD4] bg-[#14B8A6]/15 border border-[#14B8A6]/30 px-2 py-0.5 rounded-full">
+                <span className="text-base sm:text-xl font-bold">Spike AI</span>
+                <span className="hidden sm:inline-block text-[10px] font-bold tracking-widest text-[#5EEAD4] bg-[#14B8A6]/15 border border-[#14B8A6]/30 px-2 py-0.5 rounded-full">
                   AGENTS
                 </span>
               </div>
@@ -768,17 +780,46 @@ export default function LandingPage() {
               <a href="#faq" className="text-sm text-white/70 hover:text-white transition">שאלות נפוצות</a>
             </div>
 
-            <a href="#cta" className="bg-gradient-to-l from-[#22D3B0] to-[#5BD0F2] text-[#07111A] font-bold text-sm px-5 py-2.5 rounded-xl hover:shadow-lg hover:shadow-[#22D3B0]/40 transition">
+            <a href="#cta" className="hidden sm:inline-block bg-gradient-to-l from-[#22D3B0] to-[#5BD0F2] text-[#07111A] font-bold text-sm px-5 py-2.5 rounded-xl hover:shadow-lg hover:shadow-[#22D3B0]/40 transition">
               קבל הצעה אישית
             </a>
+
+            {/* Mobile hamburger button */}
+            <button
+              type="button"
+              aria-label="פתיחת תפריט"
+              aria-expanded={mobileMenuOpen}
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden flex flex-col justify-center items-center w-10 h-10 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition flex-shrink-0"
+            >
+              <span className={`block w-5 h-0.5 bg-white transition-transform ${mobileMenuOpen ? 'rotate-45 translate-y-1' : ''}`}></span>
+              <span className={`block w-5 h-0.5 bg-white mt-1 transition-opacity ${mobileMenuOpen ? 'opacity-0' : ''}`}></span>
+              <span className={`block w-5 h-0.5 bg-white mt-1 transition-transform ${mobileMenuOpen ? '-rotate-45 -translate-y-1.5' : ''}`}></span>
+            </button>
           </div>
+
+          {/* Mobile menu drawer */}
+          {mobileMenuOpen && (
+            <div className="md:hidden border-t border-white/10 bg-[#07111A]/95 backdrop-blur-xl">
+              <div className="px-4 py-4 flex flex-col gap-1">
+                <a href="#video" onClick={() => setMobileMenuOpen(false)} className="text-base text-white/80 hover:text-[#5EEAD4] transition py-3 px-3 rounded-lg hover:bg-white/5 text-right">סרטון</a>
+                <a href="#how" onClick={() => setMobileMenuOpen(false)} className="text-base text-white/80 hover:text-[#5EEAD4] transition py-3 px-3 rounded-lg hover:bg-white/5 text-right">איך זה עובד</a>
+                <a href="#agents" onClick={() => setMobileMenuOpen(false)} className="text-base text-white/80 hover:text-[#5EEAD4] transition py-3 px-3 rounded-lg hover:bg-white/5 text-right">סוכנים</a>
+                <a href="#pricing" onClick={() => setMobileMenuOpen(false)} className="text-base text-white/80 hover:text-[#5EEAD4] transition py-3 px-3 rounded-lg hover:bg-white/5 text-right">החבילה</a>
+                <a href="#faq" onClick={() => setMobileMenuOpen(false)} className="text-base text-white/80 hover:text-[#5EEAD4] transition py-3 px-3 rounded-lg hover:bg-white/5 text-right">שאלות נפוצות</a>
+                <a href="#cta" onClick={() => setMobileMenuOpen(false)} className="mt-2 bg-gradient-to-l from-[#22D3B0] to-[#5BD0F2] text-[#07111A] font-bold text-base px-5 py-3 rounded-xl text-center">
+                  🚀 קבל הצעה אישית
+                </a>
+              </div>
+            </div>
+          )}
         </nav>
 
         {/* === HERO === */}
-        <section className="relative pt-12 pb-32 px-6 lg:px-12">
+        <section className="relative pt-6 pb-12 sm:pt-10 sm:pb-20 lg:pt-12 lg:pb-32 px-4 sm:px-6 lg:px-12">
           <div className="max-w-[1280px] mx-auto relative">
-            <div className="grid lg:grid-cols-[1fr_1fr] gap-8 items-center">
-              <div className="relative flex flex-col items-center order-2 lg:order-1 py-8 min-h-[600px] justify-center">
+            <div className="grid lg:grid-cols-[1fr_1fr] gap-6 lg:gap-8 items-center">
+              <div className="relative flex flex-col items-center order-2 lg:order-1 py-2 lg:py-8 min-h-[260px] sm:min-h-[400px] lg:min-h-[600px] justify-center">
                 <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[700px] h-[500px] robot-stage pointer-events-none rounded-full" />
                 <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full pointer-events-none glow-layer-1" style={{ background: "radial-gradient(circle, rgba(94,234,212,0.6) 0%, rgba(20,184,166,0.25) 30%, transparent 70%)", filter: "blur(90px)" }} />
                 <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full pointer-events-none glow-layer-2" style={{ background: "radial-gradient(circle, rgba(91,208,242,0.5) 0%, rgba(91,208,242,0.15) 50%, transparent 80%)", filter: "blur(60px)" }} />
@@ -791,22 +832,22 @@ export default function LandingPage() {
                 <div className="absolute top-1/2 left-1/3 w-1.5 h-1.5 rounded-full bg-[#5BD0F2] particle-2 pointer-events-none" style={{ animationDelay: "2.5s" }} />
                 <div className="absolute top-3/4 right-1/3 w-1 h-1 rounded-full bg-[#22D3B0] particle-3 pointer-events-none" style={{ animationDelay: "3s" }} />
 
-                <div className="relative robot-floating z-10">
-                  <Image src="/spike-mascot-pro.png" alt="Spike AI" width={520} height={520} priority className="relative" />
+                <div className="relative robot-floating z-10 w-[200px] sm:w-[340px] lg:w-[520px]">
+                  <Image src="/spike-mascot-pro.png" alt="Spike AI" width={520} height={520} priority className="relative w-full h-auto" />
                 </div>
               </div>
 
               <div className="order-1 lg:order-2 text-right">
-                <div className="inline-flex items-center gap-2 bg-[#14B8A6]/10 border border-[#14B8A6]/30 rounded-full px-4 py-2 mb-6 text-sm text-[#5EEAD4]">
+                <div className="inline-flex items-center gap-2 bg-[#14B8A6]/10 border border-[#14B8A6]/30 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 mb-4 sm:mb-6 text-xs sm:text-sm text-[#5EEAD4]">
                   <span>חדש בישראל - לא עוד בוט. סוכן.</span>
                 </div>
 
-                <h1 className="text-4xl lg:text-6xl font-black leading-[1.1] tracking-tight mb-6">
+                <h1 className="text-3xl sm:text-4xl lg:text-6xl font-black leading-[1.15] tracking-tight mb-4 sm:mb-6">
                   צוות שלם שעובד בשבילך,{" "}
                   <span className="shimmer-text">בלי לבקש משכורת</span>
                 </h1>
 
-                <p className="text-base lg:text-xl text-white/70 leading-relaxed mb-8 max-w-2xl">
+                <p className="text-sm sm:text-base lg:text-xl text-white/70 leading-relaxed mb-6 sm:mb-8 max-w-2xl">
                   סוכני Spike עושים את העבודה שפעם היית משלם עליה אלפים: מניהול הרשתות ועד סינון לידים ובקרת איכות. כל העסק שלך מתופעל 24/7, בלי הוצאות שכר ובלי כאבי ראש.
                 </p>
 
@@ -846,7 +887,7 @@ export default function LandingPage() {
                   </div>
                 )}
 
-                <div className="flex flex-wrap gap-x-8 gap-y-2 text-sm text-white/60">
+                <div className="flex flex-wrap gap-x-6 sm:gap-x-8 gap-y-2 text-xs sm:text-sm text-white/60">
                   <span className="flex items-center gap-1.5"><span className="text-[#5EEAD4] font-bold">✓</span>הקמה תוך 7 ימים</span>
                   <span className="flex items-center gap-1.5"><span className="text-[#5EEAD4] font-bold">✓</span>בלי התחייבות</span>
                   <span className="flex items-center gap-1.5"><span className="text-[#5EEAD4] font-bold">✓</span>עברית מלאה</span>
@@ -857,14 +898,14 @@ export default function LandingPage() {
         </section>
 
         {/* === EXPLAINER VIDEO === */}
-        <section id="video" className="relative pt-8 pb-12 lg:pt-10 lg:pb-16 px-6 lg:px-12">
+        <section id="video" className="relative pt-4 pb-10 sm:pt-8 sm:pb-12 lg:pt-10 lg:pb-16 px-4 sm:px-6 lg:px-12">
           <div className="max-w-[1100px] mx-auto relative">
-            <div className="text-center mb-6">
-              <div className="inline-flex items-center gap-2 bg-[#22D3B0]/10 border border-[#22D3B0]/30 rounded-full px-4 py-2 mb-4 text-sm text-[#5EEAD4]">
+            <div className="text-center mb-5 sm:mb-6">
+              <div className="inline-flex items-center gap-2 bg-[#22D3B0]/10 border border-[#22D3B0]/30 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 mb-3 sm:mb-4 text-xs sm:text-sm text-[#5EEAD4]">
                 <span>▶</span>
                 <span>צפה בפעולה</span>
               </div>
-              <h2 className="text-2xl lg:text-4xl font-black leading-[1.1] tracking-tight mb-3">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black leading-[1.15] tracking-tight mb-3">
                 ראה את הסוכנים{" "}
                 <span className="shimmer-text">בפעולה</span>
               </h2>
@@ -889,24 +930,24 @@ export default function LandingPage() {
         </section>
 
         {/* === HOW IT WORKS === */}
-        <section id="how" className="relative py-32 px-6 lg:px-12">
+        <section id="how" className="relative py-16 sm:py-20 lg:py-32 px-4 sm:px-6 lg:px-12">
           <div className="max-w-[1280px] mx-auto relative">
-            <div className="text-center mb-20">
-              <div className="inline-flex items-center gap-2 bg-[#14B8A6]/10 border border-[#14B8A6]/30 rounded-full px-4 py-2 mb-6 text-sm text-[#5EEAD4]">
+            <div className="text-center mb-10 sm:mb-14 lg:mb-20">
+              <div className="inline-flex items-center gap-2 bg-[#14B8A6]/10 border border-[#14B8A6]/30 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 mb-4 sm:mb-6 text-xs sm:text-sm text-[#5EEAD4]">
                 <span>איך זה עובד</span>
               </div>
 
-              <div className="flex justify-center mb-6">
-                <div className="relative robot-floating-small" style={{ filter: "drop-shadow(0 15px 30px rgba(20, 184, 166, 0.4))" }}>
-                  <Image src="/spike-mascot.png" alt="Spike Mascot" width={140} height={140} className="mix-blend-screen" />
+              <div className="flex justify-center mb-4 sm:mb-6">
+                <div className="relative robot-floating-small w-[90px] sm:w-[120px] lg:w-[140px]" style={{ filter: "drop-shadow(0 15px 30px rgba(20, 184, 166, 0.4))" }}>
+                  <Image src="/spike-mascot.png" alt="Spike Mascot" width={140} height={140} className="mix-blend-screen w-full h-auto" />
                 </div>
               </div>
 
-              <h2 className="text-4xl lg:text-6xl font-black leading-[1.1] tracking-tight mb-6">
+              <h2 className="text-3xl sm:text-4xl lg:text-6xl font-black leading-[1.15] tracking-tight mb-4 sm:mb-6">
                 3 שלבים. <span className="shimmer-text">תוך 7 ימים.</span>
               </h2>
 
-              <p className="text-base lg:text-xl text-white/70 leading-relaxed max-w-2xl mx-auto">
+              <p className="text-sm sm:text-base lg:text-xl text-white/70 leading-relaxed max-w-2xl mx-auto">
                 מהקליק הראשון עד שהסוכן שלך כבר עובד - תוך שבוע. בלי בירוקרטיה, בלי בלאגן.
               </p>
             </div>
@@ -914,21 +955,21 @@ export default function LandingPage() {
             <div className="relative">
               <div className="hidden lg:block absolute top-12 right-[16.6%] left-[16.6%] h-px bg-gradient-to-l from-transparent via-[#22D3B0]/40 to-transparent pointer-events-none"></div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 relative">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 relative">
                 {[
                   { num: "01", title: "ממלאים טופס קצר", desc: "5 דקות. אתה מספר על העסק - איזה תחום, איך עובדים היום, ומה הכי כואב. זה הכל.", icon: "⏱", footer: "5 דקות מקסימום" },
                   { num: "02", title: "שיחה איתנו", desc: "אנחנו לומדים את העסק שלך - איזה סוכנים יביאו לך הכי הרבה ערך. תוך כמה ימים מקבלים הצעה מותאמת.", icon: "💬", footer: "בלי לחץ של מכירה" },
                   { num: "03", title: "הסוכן מתחיל לעבוד", desc: "אישרת את ההצעה? תוך 7 ימים הסוכן שלך כבר חי, מנתח, ושולח לך דוחות לטלגרם כל בוקר.", icon: "🚀", footer: "תוך 7 ימים" },
                 ].map((step, i) => (
-                  <div key={i} className="step-card rounded-3xl p-8 lg:p-10 relative overflow-hidden">
-                    <div className="absolute top-4 left-4 text-7xl font-black text-white/[0.03] leading-none select-none">{step.num}</div>
+                  <div key={i} className="step-card rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-10 relative overflow-hidden">
+                    <div className="absolute top-2 left-3 sm:top-4 sm:left-4 text-5xl sm:text-6xl lg:text-7xl font-black text-white/[0.03] leading-none select-none">{step.num}</div>
                     <div className="relative z-10">
-                      <div className="step-circle w-24 h-24 rounded-full bg-gradient-to-br from-[#22D3B0] to-[#5BD0F2] flex items-center justify-center mb-6 mx-auto lg:mx-0">
-                        <span className="text-3xl font-black text-[#07111A]">{step.num}</span>
+                      <div className="step-circle w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-full bg-gradient-to-br from-[#22D3B0] to-[#5BD0F2] flex items-center justify-center mb-4 sm:mb-6 mx-auto lg:mx-0">
+                        <span className="text-2xl sm:text-3xl font-black text-[#07111A]">{step.num}</span>
                       </div>
-                      <h3 className="text-2xl font-bold mb-3 text-center lg:text-right">{step.title}</h3>
-                      <p className="text-white/70 leading-relaxed text-center lg:text-right mb-4">{step.desc}</p>
-                      <div className="flex items-center gap-2 text-sm text-[#5EEAD4] justify-center lg:justify-start">
+                      <h3 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 text-center lg:text-right">{step.title}</h3>
+                      <p className="text-sm sm:text-base text-white/70 leading-relaxed text-center lg:text-right mb-3 sm:mb-4">{step.desc}</p>
+                      <div className="flex items-center gap-2 text-xs sm:text-sm text-[#5EEAD4] justify-center lg:justify-start">
                         <span>{step.icon}</span>
                         <span>{step.footer}</span>
                       </div>
@@ -941,30 +982,30 @@ export default function LandingPage() {
         </section>
 
         {/* === AGENTS === */}
-        <section id="agents" className="relative py-32 px-6 lg:px-12">
+        <section id="agents" className="relative py-16 sm:py-20 lg:py-32 px-4 sm:px-6 lg:px-12">
           <div className="max-w-[1280px] mx-auto relative">
-            <div className="text-center mb-20">
-              <div className="inline-flex items-center gap-2 bg-[#14B8A6]/10 border border-[#14B8A6]/30 rounded-full px-4 py-2 mb-6 text-sm text-[#5EEAD4]">
+            <div className="text-center mb-10 sm:mb-14 lg:mb-20">
+              <div className="inline-flex items-center gap-2 bg-[#14B8A6]/10 border border-[#14B8A6]/30 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 mb-4 sm:mb-6 text-xs sm:text-sm text-[#5EEAD4]">
                 <span>הצוות שלך</span>
               </div>
 
-              <h2 className="text-4xl lg:text-6xl font-black leading-[1.1] tracking-tight mb-6">
+              <h2 className="text-3xl sm:text-4xl lg:text-6xl font-black leading-[1.15] tracking-tight mb-4 sm:mb-6">
                 הצוות <span className="shimmer-text">שעובד בשבילך</span>
               </h2>
 
-              <p className="text-base lg:text-xl text-white/70 leading-relaxed max-w-2xl mx-auto">
+              <p className="text-sm sm:text-base lg:text-xl text-white/70 leading-relaxed max-w-2xl mx-auto">
                 כל סוכן הוא מומחה בתחום שלו. ביחד הם מטפלים בכל הצדדים של העסק - מהבוקר ועד הלילה.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {agents.map((agent, index) => (
-                <div key={index} className="agent-card rounded-3xl p-8 relative">
+                <div key={index} className="agent-card rounded-2xl sm:rounded-3xl p-6 sm:p-8 relative">
                   <div className="relative z-10">
-                    <div className="agent-icon w-16 h-16 rounded-2xl bg-gradient-to-br from-[#22D3B0] to-[#5BD0F2] flex items-center justify-center mb-5 text-3xl shadow-lg shadow-[#22D3B0]/20">
+                    <div className="agent-icon w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-[#22D3B0] to-[#5BD0F2] flex items-center justify-center mb-4 sm:mb-5 text-2xl sm:text-3xl shadow-lg shadow-[#22D3B0]/20">
                       {agent.icon}
                     </div>
-                    <h3 className="text-xl font-bold mb-3 text-right">{agent.name}</h3>
+                    <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3 text-right">{agent.name}</h3>
                     <p className="text-white/70 leading-relaxed text-right text-sm">{agent.description}</p>
                   </div>
                 </div>
@@ -974,47 +1015,47 @@ export default function LandingPage() {
         </section>
 
         {/* === PACKAGE === */}
-        <section id="pricing" className="relative py-32 px-6 lg:px-12">
+        <section id="pricing" className="relative py-16 sm:py-20 lg:py-32 px-4 sm:px-6 lg:px-12">
           <div className="max-w-[1280px] mx-auto relative">
-            <div className="text-center mb-16">
-              <div className="inline-flex items-center gap-2 bg-[#14B8A6]/10 border border-[#14B8A6]/30 rounded-full px-4 py-2 mb-6 text-sm text-[#5EEAD4]">
+            <div className="text-center mb-10 sm:mb-14 lg:mb-16">
+              <div className="inline-flex items-center gap-2 bg-[#14B8A6]/10 border border-[#14B8A6]/30 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 mb-4 sm:mb-6 text-xs sm:text-sm text-[#5EEAD4]">
                 <span>החבילה</span>
               </div>
 
-              <h2 className="text-4xl lg:text-6xl font-black leading-[1.1] tracking-tight mb-6">
+              <h2 className="text-3xl sm:text-4xl lg:text-6xl font-black leading-[1.15] tracking-tight mb-4 sm:mb-6">
                 חבילה אחת. <span className="shimmer-text">הכל כלול.</span>
               </h2>
 
-              <p className="text-base lg:text-xl text-white/70 leading-relaxed max-w-2xl mx-auto">
+              <p className="text-sm sm:text-base lg:text-xl text-white/70 leading-relaxed max-w-2xl mx-auto">
                 בלי שדרוגים. בלי תוספות. בלי הפתעות בחשבון. כל הסוכנים, כל החיבורים, וכל ההתאמות - בחבילה אחת מותאמת לעסק שלך.
               </p>
             </div>
 
-            <div className="package-hero rounded-[2rem] p-8 lg:p-12 relative overflow-hidden">
+            <div className="package-hero rounded-2xl sm:rounded-[2rem] p-5 sm:p-8 lg:p-12 relative overflow-hidden">
               <div className="absolute -top-20 -right-20 w-[400px] h-[400px] bg-[#22D3B0]/20 blur-[100px] rounded-full pointer-events-none"></div>
               <div className="absolute -bottom-20 -left-20 w-[400px] h-[400px] bg-[#5BD0F2]/20 blur-[100px] rounded-full pointer-events-none"></div>
 
               <div className="relative z-10">
-                <div className="text-center mb-12">
-                  <div className="inline-flex items-center gap-2 bg-gradient-to-l from-[#22D3B0] to-[#5BD0F2] text-[#07111A] font-black text-xs px-4 py-1.5 rounded-full shadow-lg shadow-[#22D3B0]/40 mb-6">
+                <div className="text-center mb-8 sm:mb-12">
+                  <div className="inline-flex items-center gap-2 bg-gradient-to-l from-[#22D3B0] to-[#5BD0F2] text-[#07111A] font-black text-xs px-4 py-1.5 rounded-full shadow-lg shadow-[#22D3B0]/40 mb-4 sm:mb-6">
                     🎁 הכל כלול במחיר אחד
                   </div>
 
-                  <h3 className="text-3xl lg:text-5xl font-black mb-4">החבילה המלאה</h3>
+                  <h3 className="text-2xl sm:text-3xl lg:text-5xl font-black mb-3 sm:mb-4">החבילה המלאה</h3>
 
-                  <p className="text-lg text-white/80 max-w-2xl mx-auto">
+                  <p className="text-base sm:text-lg text-white/80 max-w-2xl mx-auto">
                     הצעה מותאמת אישית לעסק שלך. בשיחה איתנו נבין את הצרכים שלך ונבנה את החבילה הנכונה.
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 items-stretch">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 mb-8 sm:mb-12 items-stretch">
                   
-                  <div className="package-column rounded-2xl p-6 order-2 md:order-1">
-                    <div className="flex items-center gap-3 mb-5 pb-4 border-b border-white/10">
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#22D3B0] to-[#5BD0F2] flex items-center justify-center text-xl">🔗</div>
-                      <h4 className="text-lg font-bold">מתחבר ל-</h4>
+                  <div className="package-column rounded-2xl p-5 sm:p-6 order-2 md:order-1">
+                    <div className="flex items-center gap-3 mb-4 sm:mb-5 pb-3 sm:pb-4 border-b border-white/10">
+                      <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#22D3B0] to-[#5BD0F2] flex items-center justify-center text-lg sm:text-xl">🔗</div>
+                      <h4 className="text-base sm:text-lg font-bold">מתחבר ל-</h4>
                     </div>
-                    <ul className="space-y-3">
+                    <ul className="space-y-2.5 sm:space-y-3">
                       {packageIncludes.connections.map((item, i) => (
                         <li key={i} className="flex items-start gap-2 text-sm text-white/85">
                           <span className="text-[#5EEAD4] font-bold mt-0.5 flex-shrink-0">✓</span>
@@ -1024,21 +1065,21 @@ export default function LandingPage() {
                     </ul>
                   </div>
 
-                  <div className="package-column-premium rounded-2xl p-6 lg:p-7 order-1 md:order-2 relative">
+                  <div className="package-column-premium rounded-2xl p-5 sm:p-6 lg:p-7 order-1 md:order-2 relative">
                     <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-l from-[#22D3B0] to-[#5BD0F2] text-[#07111A] font-black text-xs px-4 py-1.5 rounded-full shadow-lg shadow-[#22D3B0]/50 whitespace-nowrap z-10">
                       ⭐ הלב של החבילה
                     </div>
 
-                    <div className="flex items-center gap-3 mb-5 pb-4 border-b border-[#22D3B0]/20 mt-2">
-                      <div className="premium-icon w-12 h-12 rounded-xl bg-gradient-to-br from-[#22D3B0] to-[#5BD0F2] flex items-center justify-center text-2xl">
+                    <div className="flex items-center gap-3 mb-4 sm:mb-5 pb-3 sm:pb-4 border-b border-[#22D3B0]/20 mt-2">
+                      <div className="premium-icon w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-[#22D3B0] to-[#5BD0F2] flex items-center justify-center text-xl sm:text-2xl">
                         🤖
                       </div>
                       <div>
-                        <h4 className="text-xl font-black">הסוכנים</h4>
+                        <h4 className="text-lg sm:text-xl font-black">הסוכנים</h4>
                         <p className="text-xs text-[#5EEAD4]">הצוות שעובד בשבילך 24/7</p>
                       </div>
                     </div>
-                    <ul className="space-y-3">
+                    <ul className="space-y-2.5 sm:space-y-3">
                       {packageIncludes.agents.map((item, i) => (
                         <li key={i} className="flex items-start gap-2 text-sm text-white">
                           <span className="text-[#5EEAD4] font-black mt-0.5 flex-shrink-0">✓</span>
@@ -1048,12 +1089,12 @@ export default function LandingPage() {
                     </ul>
                   </div>
 
-                  <div className="package-column rounded-2xl p-6 order-3">
-                    <div className="flex items-center gap-3 mb-5 pb-4 border-b border-white/10">
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#22D3B0] to-[#5BD0F2] flex items-center justify-center text-xl">⚡</div>
-                      <h4 className="text-lg font-bold">השירות</h4>
+                  <div className="package-column rounded-2xl p-5 sm:p-6 order-3">
+                    <div className="flex items-center gap-3 mb-4 sm:mb-5 pb-3 sm:pb-4 border-b border-white/10">
+                      <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#22D3B0] to-[#5BD0F2] flex items-center justify-center text-lg sm:text-xl">⚡</div>
+                      <h4 className="text-base sm:text-lg font-bold">השירות</h4>
                     </div>
-                    <ul className="space-y-3">
+                    <ul className="space-y-2.5 sm:space-y-3">
                       {packageIncludes.service.map((item, i) => (
                         <li key={i} className="flex items-start gap-2 text-sm text-white/85">
                           <span className="text-[#5EEAD4] font-bold mt-0.5 flex-shrink-0">✓</span>
@@ -1065,10 +1106,10 @@ export default function LandingPage() {
                 </div>
 
                 <div className="text-center">
-                  <a href="#cta" className="inline-block bg-gradient-to-l from-[#22D3B0] to-[#5BD0F2] text-[#07111A] font-black px-12 py-5 rounded-xl text-lg shadow-lg shadow-[#22D3B0]/40 hover:shadow-xl hover:shadow-[#22D3B0]/60 hover:scale-105 transition-all">
+                  <a href="#cta" className="inline-block bg-gradient-to-l from-[#22D3B0] to-[#5BD0F2] text-[#07111A] font-black px-8 sm:px-12 py-4 sm:py-5 rounded-xl text-base sm:text-lg shadow-lg shadow-[#22D3B0]/40 hover:shadow-xl hover:shadow-[#22D3B0]/60 hover:scale-105 transition-all">
                     קבל הצעה אישית
                   </a>
-                  <p className="text-sm text-white/50 mt-4">
+                  <p className="text-xs sm:text-sm text-white/50 mt-3 sm:mt-4">
                     בלי התחייבות. בלי לחץ של מכירה.
                   </p>
                 </div>
@@ -1078,23 +1119,23 @@ export default function LandingPage() {
         </section>
 
         {/* === DETAILED FORM === */}
-        <section id="cta" className="relative py-32 px-6 lg:px-12">
+        <section id="cta" className="relative py-16 sm:py-20 lg:py-32 px-4 sm:px-6 lg:px-12">
           <div className="max-w-[800px] mx-auto relative">
-            <div className="text-center mb-12">
-              <div className="inline-flex items-center gap-2 bg-[#14B8A6]/10 border border-[#14B8A6]/30 rounded-full px-4 py-2 mb-6 text-sm text-[#5EEAD4]">
+            <div className="text-center mb-8 sm:mb-12">
+              <div className="inline-flex items-center gap-2 bg-[#14B8A6]/10 border border-[#14B8A6]/30 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 mb-4 sm:mb-6 text-xs sm:text-sm text-[#5EEAD4]">
                 <span>קבל הצעה</span>
               </div>
 
-              <h2 className="text-4xl lg:text-6xl font-black leading-[1.1] tracking-tight mb-6">
+              <h2 className="text-3xl sm:text-4xl lg:text-6xl font-black leading-[1.15] tracking-tight mb-4 sm:mb-6">
                 מוכן להתחיל? <span className="shimmer-text">בוא נדבר.</span>
               </h2>
 
-              <p className="text-base lg:text-xl text-white/70 leading-relaxed max-w-2xl mx-auto">
+              <p className="text-sm sm:text-base lg:text-xl text-white/70 leading-relaxed max-w-2xl mx-auto">
                 השאר פרטים ונחזור אליך תוך 24 שעות עם הצעה אישית מותאמת לעסק שלך. בלי התחייבות, בלי לחץ.
               </p>
             </div>
 
-            <div className="cta-form-card rounded-[2rem] p-8 lg:p-12 relative overflow-hidden">
+            <div className="cta-form-card rounded-2xl sm:rounded-[2rem] p-5 sm:p-8 lg:p-12 relative overflow-hidden">
               <div className="absolute -top-20 -right-20 w-[400px] h-[400px] bg-[#22D3B0]/20 blur-[100px] rounded-full pointer-events-none"></div>
               <div className="absolute -bottom-20 -left-20 w-[400px] h-[400px] bg-[#5BD0F2]/20 blur-[100px] rounded-full pointer-events-none"></div>
 
@@ -1211,34 +1252,34 @@ export default function LandingPage() {
         </section>
 
         {/* === FAQ === */}
-        <section id="faq" className="relative py-32 px-6 lg:px-12">
+        <section id="faq" className="relative py-16 sm:py-20 lg:py-32 px-4 sm:px-6 lg:px-12">
           <div className="max-w-[900px] mx-auto relative">
-            <div className="text-center mb-16">
-              <div className="inline-flex items-center gap-2 bg-[#14B8A6]/10 border border-[#14B8A6]/30 rounded-full px-4 py-2 mb-6 text-sm text-[#5EEAD4]">
+            <div className="text-center mb-10 sm:mb-14 lg:mb-16">
+              <div className="inline-flex items-center gap-2 bg-[#14B8A6]/10 border border-[#14B8A6]/30 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 mb-4 sm:mb-6 text-xs sm:text-sm text-[#5EEAD4]">
                 <span>שאלות נפוצות</span>
               </div>
 
-              <h2 className="text-4xl lg:text-6xl font-black leading-[1.1] tracking-tight mb-6">
+              <h2 className="text-3xl sm:text-4xl lg:text-6xl font-black leading-[1.15] tracking-tight mb-4 sm:mb-6">
                 יש לך שאלות? <span className="shimmer-text">יש לנו תשובות.</span>
               </h2>
 
-              <p className="text-base lg:text-xl text-white/70 leading-relaxed max-w-2xl mx-auto">
+              <p className="text-sm sm:text-base lg:text-xl text-white/70 leading-relaxed max-w-2xl mx-auto">
                 התשובות לשאלות הנפוצות שאנחנו מקבלים. אם משהו לא ברור - תמיד אפשר לפנות אלינו.
               </p>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {faqs.map((faq, index) => (
                 <div
                   key={index}
-                  className={`faq-item rounded-2xl ${openFaq === index ? "faq-open" : ""}`}
+                  className={`faq-item rounded-xl sm:rounded-2xl ${openFaq === index ? "faq-open" : ""}`}
                 >
                   <button
                     className="faq-button"
                     onClick={() => toggleFaq(index)}
                     aria-expanded={openFaq === index}
                   >
-                    <span className="text-base lg:text-lg font-bold text-right flex-1">
+                    <span className="text-sm sm:text-base lg:text-lg font-bold text-right flex-1">
                       {faq.question}
                     </span>
                     <span className="faq-icon">+</span>
@@ -1252,13 +1293,13 @@ export default function LandingPage() {
               ))}
             </div>
 
-            <div className="text-center mt-12">
-              <p className="text-base text-white/60 mb-4">
+            <div className="text-center mt-10 sm:mt-12">
+              <p className="text-sm sm:text-base text-white/60 mb-3 sm:mb-4">
                 יש לך שאלה אחרת?
               </p>
               <a
                 href="#cta"
-                className="inline-block bg-white/5 border border-white/15 text-white font-semibold px-8 py-4 rounded-xl text-base hover:bg-white/10 transition"
+                className="inline-block bg-white/5 border border-white/15 text-white font-semibold px-6 sm:px-8 py-3 sm:py-4 rounded-xl text-sm sm:text-base hover:bg-white/10 transition"
               >
                 בוא נדבר ←
               </a>
@@ -1272,8 +1313,8 @@ export default function LandingPage() {
             <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[700px] h-[300px] bg-[#22D3B0]/8 blur-[140px] rounded-full"></div>
           </div>
 
-          <div className="max-w-[1280px] mx-auto px-6 lg:px-12 py-14 relative">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-8 mb-10">
+          <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-12 py-10 sm:py-14 relative">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 md:gap-8 mb-8 sm:mb-10">
 
               {/* עמודה 1: לוגו + תיאור */}
               <div className="text-center md:text-right">
