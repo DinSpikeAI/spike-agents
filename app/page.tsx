@@ -737,7 +737,7 @@ export default function LandingPage() {
         }
       `}</style>
 
-      <div dir="rtl" className="min-h-screen bg-[#07111A] text-white overflow-x-hidden relative">
+      <div dir="rtl" className="min-h-screen bg-transparent text-[#0F1620] overflow-x-hidden relative">
         
         <div className="absolute inset-0 grid-bg pointer-events-none" />
         
@@ -758,7 +758,7 @@ export default function LandingPage() {
           <div className="absolute top-[5500px] left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[#22D3B0]/12 blur-[140px] rounded-full section-glow" style={{ animationDelay: "0.5s" }}></div>
         </div>
 
-        <nav className="sticky top-0 z-50 backdrop-blur-md bg-[#07111A]/70 border-b border-white/5">
+        <nav className="sticky top-0 z-50 backdrop-blur-md bg-white/70 border-b border-black/[0.06]">
           <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-12 py-3 sm:py-4 flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
               <div className="relative w-8 h-8 sm:w-10 sm:h-10">
@@ -766,18 +766,18 @@ export default function LandingPage() {
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-base sm:text-xl font-bold">Spike AI</span>
-                <span className="hidden sm:inline-block text-[10px] font-bold tracking-widest text-[#5EEAD4] bg-[#14B8A6]/15 border border-[#14B8A6]/30 px-2 py-0.5 rounded-full">
+                <span className="hidden sm:inline-block text-[10px] font-bold tracking-widest text-[#0F766E] bg-[#14B8A6]/15 border border-[#14B8A6]/30 px-2 py-0.5 rounded-full">
                   AGENTS
                 </span>
               </div>
             </div>
 
             <div className="hidden md:flex items-center gap-8">
-              <a href="#video" className="text-sm text-white/70 hover:text-white transition">סרטון</a>
-              <a href="#how" className="text-sm text-white/70 hover:text-white transition">איך זה עובד</a>
-              <a href="#agents" className="text-sm text-white/70 hover:text-white transition">סוכנים</a>
-              <a href="#pricing" className="text-sm text-white/70 hover:text-white transition">החבילה</a>
-              <a href="#faq" className="text-sm text-white/70 hover:text-white transition">שאלות נפוצות</a>
+              <a href="#video" className="text-sm text-[#3F4654] hover:text-[#0F1620] transition">סרטון</a>
+              <a href="#how" className="text-sm text-[#3F4654] hover:text-[#0F1620] transition">איך זה עובד</a>
+              <a href="#agents" className="text-sm text-[#3F4654] hover:text-[#0F1620] transition">סוכנים</a>
+              <a href="#pricing" className="text-sm text-[#3F4654] hover:text-[#0F1620] transition">החבילה</a>
+              <a href="#faq" className="text-sm text-[#3F4654] hover:text-[#0F1620] transition">שאלות נפוצות</a>
             </div>
 
             <a href="#cta" className="hidden sm:inline-block bg-gradient-to-l from-[#22D3B0] to-[#5BD0F2] text-[#07111A] font-bold text-sm px-5 py-2.5 rounded-xl hover:shadow-lg hover:shadow-[#22D3B0]/40 transition">
@@ -790,7 +790,7 @@ export default function LandingPage() {
               aria-label="פתיחת תפריט"
               aria-expanded={mobileMenuOpen}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden flex flex-col justify-center items-center w-10 h-10 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition flex-shrink-0"
+              className="md:hidden flex flex-col justify-center items-center w-10 h-10 rounded-lg bg-white/70 border border-black/[0.08] hover:bg-white/80 transition flex-shrink-0"
             >
               <span className={`block w-5 h-0.5 bg-white transition-transform ${mobileMenuOpen ? 'rotate-45 translate-y-1' : ''}`}></span>
               <span className={`block w-5 h-0.5 bg-white mt-1 transition-opacity ${mobileMenuOpen ? 'opacity-0' : ''}`}></span>
@@ -800,13 +800,13 @@ export default function LandingPage() {
 
           {/* Mobile menu drawer */}
           {mobileMenuOpen && (
-            <div className="md:hidden border-t border-white/10 bg-[#07111A]/95 backdrop-blur-xl">
+            <div className="md:hidden border-t border-black/[0.08] bg-white/85 backdrop-blur-xl">
               <div className="px-4 py-4 flex flex-col gap-1">
-                <a href="#video" onClick={() => setMobileMenuOpen(false)} className="text-base text-white/80 hover:text-[#5EEAD4] transition py-3 px-3 rounded-lg hover:bg-white/5 text-right">סרטון</a>
-                <a href="#how" onClick={() => setMobileMenuOpen(false)} className="text-base text-white/80 hover:text-[#5EEAD4] transition py-3 px-3 rounded-lg hover:bg-white/5 text-right">איך זה עובד</a>
-                <a href="#agents" onClick={() => setMobileMenuOpen(false)} className="text-base text-white/80 hover:text-[#5EEAD4] transition py-3 px-3 rounded-lg hover:bg-white/5 text-right">סוכנים</a>
-                <a href="#pricing" onClick={() => setMobileMenuOpen(false)} className="text-base text-white/80 hover:text-[#5EEAD4] transition py-3 px-3 rounded-lg hover:bg-white/5 text-right">החבילה</a>
-                <a href="#faq" onClick={() => setMobileMenuOpen(false)} className="text-base text-white/80 hover:text-[#5EEAD4] transition py-3 px-3 rounded-lg hover:bg-white/5 text-right">שאלות נפוצות</a>
+                <a href="#video" onClick={() => setMobileMenuOpen(false)} className="text-base text-[#3F4654] hover:text-[#0F766E] transition py-3 px-3 rounded-lg hover:bg-white/70 text-right">סרטון</a>
+                <a href="#how" onClick={() => setMobileMenuOpen(false)} className="text-base text-[#3F4654] hover:text-[#0F766E] transition py-3 px-3 rounded-lg hover:bg-white/70 text-right">איך זה עובד</a>
+                <a href="#agents" onClick={() => setMobileMenuOpen(false)} className="text-base text-[#3F4654] hover:text-[#0F766E] transition py-3 px-3 rounded-lg hover:bg-white/70 text-right">סוכנים</a>
+                <a href="#pricing" onClick={() => setMobileMenuOpen(false)} className="text-base text-[#3F4654] hover:text-[#0F766E] transition py-3 px-3 rounded-lg hover:bg-white/70 text-right">החבילה</a>
+                <a href="#faq" onClick={() => setMobileMenuOpen(false)} className="text-base text-[#3F4654] hover:text-[#0F766E] transition py-3 px-3 rounded-lg hover:bg-white/70 text-right">שאלות נפוצות</a>
                 <a href="#cta" onClick={() => setMobileMenuOpen(false)} className="mt-2 bg-gradient-to-l from-[#22D3B0] to-[#5BD0F2] text-[#07111A] font-bold text-base px-5 py-3 rounded-xl text-center">
                   🚀 קבל הצעה אישית
                 </a>
@@ -838,7 +838,7 @@ export default function LandingPage() {
               </div>
 
               <div className="order-1 lg:order-2 text-right">
-                <div className="inline-flex items-center gap-2 bg-[#14B8A6]/10 border border-[#14B8A6]/30 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 mb-4 sm:mb-6 text-xs sm:text-sm text-[#5EEAD4]">
+                <div className="inline-flex items-center gap-2 bg-[#14B8A6]/10 border border-[#14B8A6]/30 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 mb-4 sm:mb-6 text-xs sm:text-sm text-[#0F766E]">
                   <span>חדש בישראל - לא עוד בוט. סוכן.</span>
                 </div>
 
@@ -847,7 +847,7 @@ export default function LandingPage() {
                   <span className="shimmer-text">בלי לבקש משכורת</span>
                 </h1>
 
-                <p className="text-sm sm:text-base lg:text-xl text-white/70 leading-relaxed mb-6 sm:mb-8 max-w-2xl">
+                <p className="text-sm sm:text-base lg:text-xl text-[#3F4654] leading-relaxed mb-6 sm:mb-8 max-w-2xl">
                   סוכני Spike עושים את העבודה שפעם היית משלם עליה אלפים: מניהול הרשתות ועד סינון לידים ובקרת איכות. כל העסק שלך מתופעל 24/7, בלי הוצאות שכר ובלי כאבי ראש.
                 </p>
 
@@ -865,14 +865,14 @@ export default function LandingPage() {
                     <button type="submit" disabled={heroSubmitting} className="w-full bg-gradient-to-l from-[#22D3B0] to-[#5BD0F2] text-[#07111A] font-black px-8 py-4 rounded-xl text-base shadow-lg shadow-[#22D3B0]/40 hover:shadow-xl hover:shadow-[#22D3B0]/60 hover:scale-[1.02] transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100">
                       {heroSubmitting ? "שולח..." : "🚀 קבל הצעה אישית"}
                     </button>
-                    <p className="text-xs text-white/50 text-center">
+                    <p className="text-xs text-[#727988] text-center">
                       ⚡ נחזור אליך תוך 24 שעות. בלי התחייבות.
                     </p>
-                    <p className="text-[11px] text-white/40 text-center leading-relaxed mt-2">
+                    <p className="text-[11px] text-[#727988] text-center leading-relaxed mt-2">
                       בלחיצה על &quot;קבל הצעה אישית&quot; אני מסכים/ה ל
-                      <Link href="/privacy" target="_blank" rel="noopener" className="text-white/60 hover:text-[#5EEAD4] underline underline-offset-2">מדיניות הפרטיות</Link>
+                      <Link href="/privacy" target="_blank" rel="noopener" className="text-[#3F4654] hover:text-[#0F766E] underline underline-offset-2">מדיניות הפרטיות</Link>
                       {" "}ול
-                      <Link href="/terms" target="_blank" rel="noopener" className="text-white/60 hover:text-[#5EEAD4] underline underline-offset-2">תנאי השימוש</Link>.
+                      <Link href="/terms" target="_blank" rel="noopener" className="text-[#3F4654] hover:text-[#0F766E] underline underline-offset-2">תנאי השימוש</Link>.
                     </p>
                   </form>
                 ) : (
@@ -881,16 +881,16 @@ export default function LandingPage() {
                     <h3 className="text-2xl font-black mb-2">
                       תודה <span className="shimmer-text">{heroForm.name}!</span>
                     </h3>
-                    <p className="text-base text-white/80">
+                    <p className="text-base text-[#3F4654]">
                       קיבלנו את הפרטים. נחזור אליך תוך 24 שעות.
                     </p>
                   </div>
                 )}
 
-                <div className="flex flex-wrap gap-x-6 sm:gap-x-8 gap-y-2 text-xs sm:text-sm text-white/60">
-                  <span className="flex items-center gap-1.5"><span className="text-[#5EEAD4] font-bold">✓</span>הקמה תוך 7 ימים</span>
-                  <span className="flex items-center gap-1.5"><span className="text-[#5EEAD4] font-bold">✓</span>בלי התחייבות</span>
-                  <span className="flex items-center gap-1.5"><span className="text-[#5EEAD4] font-bold">✓</span>עברית מלאה</span>
+                <div className="flex flex-wrap gap-x-6 sm:gap-x-8 gap-y-2 text-xs sm:text-sm text-[#3F4654]">
+                  <span className="flex items-center gap-1.5"><span className="text-[#0F766E] font-bold">✓</span>הקמה תוך 7 ימים</span>
+                  <span className="flex items-center gap-1.5"><span className="text-[#0F766E] font-bold">✓</span>בלי התחייבות</span>
+                  <span className="flex items-center gap-1.5"><span className="text-[#0F766E] font-bold">✓</span>עברית מלאה</span>
                 </div>
               </div>
             </div>
@@ -901,7 +901,7 @@ export default function LandingPage() {
         <section id="video" className="relative pt-4 pb-10 sm:pt-8 sm:pb-12 lg:pt-10 lg:pb-16 px-4 sm:px-6 lg:px-12">
           <div className="max-w-[1100px] mx-auto relative">
             <div className="text-center mb-5 sm:mb-6">
-              <div className="inline-flex items-center gap-2 bg-[#22D3B0]/10 border border-[#22D3B0]/30 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 mb-3 sm:mb-4 text-xs sm:text-sm text-[#5EEAD4]">
+              <div className="inline-flex items-center gap-2 bg-[#22D3B0]/10 border border-[#22D3B0]/30 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 mb-3 sm:mb-4 text-xs sm:text-sm text-[#0F766E]">
                 <span>▶</span>
                 <span>צפה בפעולה</span>
               </div>
@@ -909,7 +909,7 @@ export default function LandingPage() {
                 ראה את הסוכנים{" "}
                 <span className="shimmer-text">בפעולה</span>
               </h2>
-              <p className="text-sm lg:text-base text-white/70">
+              <p className="text-sm lg:text-base text-[#3F4654]">
                 60 שניות שמסבירות הכל. מה הם עושים, איך הם עובדים, ואיך זה משנה את היום שלך.
               </p>
             </div>
@@ -933,7 +933,7 @@ export default function LandingPage() {
         <section id="how" className="relative py-16 sm:py-20 lg:py-32 px-4 sm:px-6 lg:px-12">
           <div className="max-w-[1280px] mx-auto relative">
             <div className="text-center mb-10 sm:mb-14 lg:mb-20">
-              <div className="inline-flex items-center gap-2 bg-[#14B8A6]/10 border border-[#14B8A6]/30 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 mb-4 sm:mb-6 text-xs sm:text-sm text-[#5EEAD4]">
+              <div className="inline-flex items-center gap-2 bg-[#14B8A6]/10 border border-[#14B8A6]/30 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 mb-4 sm:mb-6 text-xs sm:text-sm text-[#0F766E]">
                 <span>איך זה עובד</span>
               </div>
 
@@ -947,7 +947,7 @@ export default function LandingPage() {
                 3 שלבים. <span className="shimmer-text">תוך 7 ימים.</span>
               </h2>
 
-              <p className="text-sm sm:text-base lg:text-xl text-white/70 leading-relaxed max-w-2xl mx-auto">
+              <p className="text-sm sm:text-base lg:text-xl text-[#3F4654] leading-relaxed max-w-2xl mx-auto">
                 מהקליק הראשון עד שהסוכן שלך כבר עובד - תוך שבוע. בלי בירוקרטיה, בלי בלאגן.
               </p>
             </div>
@@ -962,14 +962,14 @@ export default function LandingPage() {
                   { num: "03", title: "הסוכן מתחיל לעבוד", desc: "אישרת את ההצעה? תוך 7 ימים הסוכן שלך כבר חי, מנתח, ושולח לך דוחות לוואטסאפ כל בוקר.", icon: "🚀", footer: "תוך 7 ימים" },
                 ].map((step, i) => (
                   <div key={i} className="step-card rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-10 relative overflow-hidden">
-                    <div className="absolute top-2 left-3 sm:top-4 sm:left-4 text-5xl sm:text-6xl lg:text-7xl font-black text-white/[0.03] leading-none select-none">{step.num}</div>
+                    <div className="absolute top-2 left-3 sm:top-4 sm:left-4 text-5xl sm:text-6xl lg:text-7xl font-black text-[#0F1620]/[0.03] leading-none select-none">{step.num}</div>
                     <div className="relative z-10">
                       <div className="step-circle w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-full bg-gradient-to-br from-[#22D3B0] to-[#5BD0F2] flex items-center justify-center mb-4 sm:mb-6 mx-auto lg:mx-0">
                         <span className="text-2xl sm:text-3xl font-black text-[#07111A]">{step.num}</span>
                       </div>
                       <h3 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 text-center lg:text-right">{step.title}</h3>
-                      <p className="text-sm sm:text-base text-white/70 leading-relaxed text-center lg:text-right mb-3 sm:mb-4">{step.desc}</p>
-                      <div className="flex items-center gap-2 text-xs sm:text-sm text-[#5EEAD4] justify-center lg:justify-start">
+                      <p className="text-sm sm:text-base text-[#3F4654] leading-relaxed text-center lg:text-right mb-3 sm:mb-4">{step.desc}</p>
+                      <div className="flex items-center gap-2 text-xs sm:text-sm text-[#0F766E] justify-center lg:justify-start">
                         <span>{step.icon}</span>
                         <span>{step.footer}</span>
                       </div>
@@ -985,7 +985,7 @@ export default function LandingPage() {
         <section id="agents" className="relative py-16 sm:py-20 lg:py-32 px-4 sm:px-6 lg:px-12">
           <div className="max-w-[1280px] mx-auto relative">
             <div className="text-center mb-10 sm:mb-14 lg:mb-20">
-              <div className="inline-flex items-center gap-2 bg-[#14B8A6]/10 border border-[#14B8A6]/30 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 mb-4 sm:mb-6 text-xs sm:text-sm text-[#5EEAD4]">
+              <div className="inline-flex items-center gap-2 bg-[#14B8A6]/10 border border-[#14B8A6]/30 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 mb-4 sm:mb-6 text-xs sm:text-sm text-[#0F766E]">
                 <span>הצוות שלך</span>
               </div>
 
@@ -993,7 +993,7 @@ export default function LandingPage() {
                 הצוות <span className="shimmer-text">שעובד בשבילך</span>
               </h2>
 
-              <p className="text-sm sm:text-base lg:text-xl text-white/70 leading-relaxed max-w-2xl mx-auto">
+              <p className="text-sm sm:text-base lg:text-xl text-[#3F4654] leading-relaxed max-w-2xl mx-auto">
                 כל סוכן הוא מומחה בתחום שלו. ביחד הם מטפלים בכל הצדדים של העסק - מהבוקר ועד הלילה.
               </p>
             </div>
@@ -1006,7 +1006,7 @@ export default function LandingPage() {
                       {agent.icon}
                     </div>
                     <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3 text-right">{agent.name}</h3>
-                    <p className="text-white/70 leading-relaxed text-right text-sm">{agent.description}</p>
+                    <p className="text-[#3F4654] leading-relaxed text-right text-sm">{agent.description}</p>
                   </div>
                 </div>
               ))}
@@ -1018,7 +1018,7 @@ export default function LandingPage() {
         <section id="pricing" className="relative py-16 sm:py-20 lg:py-32 px-4 sm:px-6 lg:px-12">
           <div className="max-w-[1280px] mx-auto relative">
             <div className="text-center mb-10 sm:mb-14 lg:mb-16">
-              <div className="inline-flex items-center gap-2 bg-[#14B8A6]/10 border border-[#14B8A6]/30 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 mb-4 sm:mb-6 text-xs sm:text-sm text-[#5EEAD4]">
+              <div className="inline-flex items-center gap-2 bg-[#14B8A6]/10 border border-[#14B8A6]/30 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 mb-4 sm:mb-6 text-xs sm:text-sm text-[#0F766E]">
                 <span>החבילה</span>
               </div>
 
@@ -1026,7 +1026,7 @@ export default function LandingPage() {
                 חבילה אחת. <span className="shimmer-text">הכל כלול.</span>
               </h2>
 
-              <p className="text-sm sm:text-base lg:text-xl text-white/70 leading-relaxed max-w-2xl mx-auto">
+              <p className="text-sm sm:text-base lg:text-xl text-[#3F4654] leading-relaxed max-w-2xl mx-auto">
                 בלי שדרוגים. בלי תוספות. בלי הפתעות בחשבון. כל הסוכנים, כל החיבורים, וכל ההתאמות - בחבילה אחת מותאמת לעסק שלך.
               </p>
             </div>
@@ -1043,7 +1043,7 @@ export default function LandingPage() {
 
                   <h3 className="text-2xl sm:text-3xl lg:text-5xl font-black mb-3 sm:mb-4">החבילה המלאה</h3>
 
-                  <p className="text-base sm:text-lg text-white/80 max-w-2xl mx-auto">
+                  <p className="text-base sm:text-lg text-[#3F4654] max-w-2xl mx-auto">
                     הצעה מותאמת אישית לעסק שלך. בשיחה איתנו נבין את הצרכים שלך ונבנה את החבילה הנכונה.
                   </p>
                 </div>
@@ -1051,14 +1051,14 @@ export default function LandingPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 mb-8 sm:mb-12 items-stretch">
                   
                   <div className="package-column rounded-2xl p-5 sm:p-6 order-2 md:order-1">
-                    <div className="flex items-center gap-3 mb-4 sm:mb-5 pb-3 sm:pb-4 border-b border-white/10">
+                    <div className="flex items-center gap-3 mb-4 sm:mb-5 pb-3 sm:pb-4 border-b border-black/[0.08]">
                       <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#22D3B0] to-[#5BD0F2] flex items-center justify-center text-lg sm:text-xl">🔗</div>
                       <h4 className="text-base sm:text-lg font-bold">מתחבר ל-</h4>
                     </div>
                     <ul className="space-y-2.5 sm:space-y-3">
                       {packageIncludes.connections.map((item, i) => (
-                        <li key={i} className="flex items-start gap-2 text-sm text-white/85">
-                          <span className="text-[#5EEAD4] font-bold mt-0.5 flex-shrink-0">✓</span>
+                        <li key={i} className="flex items-start gap-2 text-sm text-[#0F1620]">
+                          <span className="text-[#0F766E] font-bold mt-0.5 flex-shrink-0">✓</span>
                           <span>{item}</span>
                         </li>
                       ))}
@@ -1076,13 +1076,13 @@ export default function LandingPage() {
                       </div>
                       <div>
                         <h4 className="text-lg sm:text-xl font-black">הסוכנים</h4>
-                        <p className="text-xs text-[#5EEAD4]">הצוות שעובד בשבילך 24/7</p>
+                        <p className="text-xs text-[#0F766E]">הצוות שעובד בשבילך 24/7</p>
                       </div>
                     </div>
                     <ul className="space-y-2.5 sm:space-y-3">
                       {packageIncludes.agents.map((item, i) => (
-                        <li key={i} className="flex items-start gap-2 text-sm text-white">
-                          <span className="text-[#5EEAD4] font-black mt-0.5 flex-shrink-0">✓</span>
+                        <li key={i} className="flex items-start gap-2 text-sm text-[#0F1620]">
+                          <span className="text-[#0F766E] font-black mt-0.5 flex-shrink-0">✓</span>
                           <span>{item}</span>
                         </li>
                       ))}
@@ -1090,14 +1090,14 @@ export default function LandingPage() {
                   </div>
 
                   <div className="package-column rounded-2xl p-5 sm:p-6 order-3">
-                    <div className="flex items-center gap-3 mb-4 sm:mb-5 pb-3 sm:pb-4 border-b border-white/10">
+                    <div className="flex items-center gap-3 mb-4 sm:mb-5 pb-3 sm:pb-4 border-b border-black/[0.08]">
                       <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#22D3B0] to-[#5BD0F2] flex items-center justify-center text-lg sm:text-xl">⚡</div>
                       <h4 className="text-base sm:text-lg font-bold">השירות</h4>
                     </div>
                     <ul className="space-y-2.5 sm:space-y-3">
                       {packageIncludes.service.map((item, i) => (
-                        <li key={i} className="flex items-start gap-2 text-sm text-white/85">
-                          <span className="text-[#5EEAD4] font-bold mt-0.5 flex-shrink-0">✓</span>
+                        <li key={i} className="flex items-start gap-2 text-sm text-[#0F1620]">
+                          <span className="text-[#0F766E] font-bold mt-0.5 flex-shrink-0">✓</span>
                           <span>{item}</span>
                         </li>
                       ))}
@@ -1109,7 +1109,7 @@ export default function LandingPage() {
                   <a href="#cta" className="inline-block bg-gradient-to-l from-[#22D3B0] to-[#5BD0F2] text-[#07111A] font-black px-8 sm:px-12 py-4 sm:py-5 rounded-xl text-base sm:text-lg shadow-lg shadow-[#22D3B0]/40 hover:shadow-xl hover:shadow-[#22D3B0]/60 hover:scale-105 transition-all">
                     קבל הצעה אישית
                   </a>
-                  <p className="text-xs sm:text-sm text-white/50 mt-3 sm:mt-4">
+                  <p className="text-xs sm:text-sm text-[#727988] mt-3 sm:mt-4">
                     בלי התחייבות. בלי לחץ של מכירה.
                   </p>
                 </div>
@@ -1122,7 +1122,7 @@ export default function LandingPage() {
         <section id="cta" className="relative py-16 sm:py-20 lg:py-32 px-4 sm:px-6 lg:px-12">
           <div className="max-w-[800px] mx-auto relative">
             <div className="text-center mb-8 sm:mb-12">
-              <div className="inline-flex items-center gap-2 bg-[#14B8A6]/10 border border-[#14B8A6]/30 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 mb-4 sm:mb-6 text-xs sm:text-sm text-[#5EEAD4]">
+              <div className="inline-flex items-center gap-2 bg-[#14B8A6]/10 border border-[#14B8A6]/30 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 mb-4 sm:mb-6 text-xs sm:text-sm text-[#0F766E]">
                 <span>קבל הצעה</span>
               </div>
 
@@ -1130,7 +1130,7 @@ export default function LandingPage() {
                 מוכן להתחיל? <span className="shimmer-text">בוא נדבר.</span>
               </h2>
 
-              <p className="text-sm sm:text-base lg:text-xl text-white/70 leading-relaxed max-w-2xl mx-auto">
+              <p className="text-sm sm:text-base lg:text-xl text-[#3F4654] leading-relaxed max-w-2xl mx-auto">
                 השאר פרטים ונחזור אליך תוך 24 שעות עם הצעה אישית מותאמת לעסק שלך. בלי התחייבות, בלי לחץ.
               </p>
             </div>
@@ -1143,22 +1143,22 @@ export default function LandingPage() {
                 {!isSubmitted ? (
                   <form onSubmit={handleSubmit} className="space-y-5">
                     <div>
-                      <label htmlFor="name" className="block text-sm font-semibold mb-2 text-right text-white/90">שם מלא</label>
+                      <label htmlFor="name" className="block text-sm font-semibold mb-2 text-right text-[#0F1620]">שם מלא</label>
                       <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} placeholder="ישראל ישראלי" required className="cta-input" />
                     </div>
 
                     <div>
-                      <label htmlFor="phone" className="block text-sm font-semibold mb-2 text-right text-white/90">טלפון</label>
+                      <label htmlFor="phone" className="block text-sm font-semibold mb-2 text-right text-[#0F1620]">טלפון</label>
                       <input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleChange} placeholder="050-1234567" required className="cta-input" />
                     </div>
 
                     <div>
-                      <label htmlFor="email" className="block text-sm font-semibold mb-2 text-right text-white/90">אימייל</label>
+                      <label htmlFor="email" className="block text-sm font-semibold mb-2 text-right text-[#0F1620]">אימייל</label>
                       <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} placeholder="israel@example.com" required className="cta-input" />
                     </div>
 
                     <div>
-                      <label htmlFor="businessType" className="block text-sm font-semibold mb-2 text-right text-white/90">תחום העסק</label>
+                      <label htmlFor="businessType" className="block text-sm font-semibold mb-2 text-right text-[#0F1620]">תחום העסק</label>
                       <select id="businessType" name="businessType" value={formData.businessType} onChange={handleChange} required className="cta-input cta-select">
                         <option value="">בחר תחום</option>
                         <option value="service">💼 עסק שירות (קליניקה, מספרה, מאמן)</option>
@@ -1222,7 +1222,7 @@ export default function LandingPage() {
                       {isSubmitting ? "שולח..." : "שלח ובוא נדבר"}
                     </button>
 
-                    <p className="text-xs text-white/50 text-center mt-4">
+                    <p className="text-xs text-[#727988] text-center mt-4">
                       🔒 הפרטים שלך מוגנים. אנחנו לא משתפים אותם עם אף אחד.
                     </p>
                   </form>
@@ -1232,9 +1232,9 @@ export default function LandingPage() {
                     <h3 className="text-3xl lg:text-4xl font-black mb-4">
                       תודה <span className="shimmer-text">{formData.name}!</span>
                     </h3>
-                    <p className="text-lg text-white/80 mb-2">קיבלנו את הפרטים שלך.</p>
-                    <p className="text-base text-white/70 mb-8">נחזור אליך תוך 24 שעות עם הצעה אישית מותאמת לעסק שלך.</p>
-                    <div className="inline-flex items-center gap-2 bg-[#14B8A6]/10 border border-[#14B8A6]/30 rounded-full px-4 py-2 text-sm text-[#5EEAD4]">
+                    <p className="text-lg text-[#3F4654] mb-2">קיבלנו את הפרטים שלך.</p>
+                    <p className="text-base text-[#3F4654] mb-8">נחזור אליך תוך 24 שעות עם הצעה אישית מותאמת לעסק שלך.</p>
+                    <div className="inline-flex items-center gap-2 bg-[#14B8A6]/10 border border-[#14B8A6]/30 rounded-full px-4 py-2 text-sm text-[#0F766E]">
                       <span>📱</span>
                       <span>תקבל אישור באימייל</span>
                     </div>
@@ -1243,10 +1243,10 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div className="mt-12 flex flex-wrap justify-center gap-x-8 gap-y-4 text-sm text-white/60">
-              <span className="flex items-center gap-2"><span className="text-[#5EEAD4]">⚡</span><span>תגובה תוך 24 שעות</span></span>
-              <span className="flex items-center gap-2"><span className="text-[#5EEAD4]">🛡️</span><span>בלי התחייבות</span></span>
-              <span className="flex items-center gap-2"><span className="text-[#5EEAD4]">🇮🇱</span><span>שירות בעברית</span></span>
+            <div className="mt-12 flex flex-wrap justify-center gap-x-8 gap-y-4 text-sm text-[#3F4654]">
+              <span className="flex items-center gap-2"><span className="text-[#0F766E]">⚡</span><span>תגובה תוך 24 שעות</span></span>
+              <span className="flex items-center gap-2"><span className="text-[#0F766E]">🛡️</span><span>בלי התחייבות</span></span>
+              <span className="flex items-center gap-2"><span className="text-[#0F766E]">🇮🇱</span><span>שירות בעברית</span></span>
             </div>
           </div>
         </section>
@@ -1255,7 +1255,7 @@ export default function LandingPage() {
         <section id="faq" className="relative py-16 sm:py-20 lg:py-32 px-4 sm:px-6 lg:px-12">
           <div className="max-w-[900px] mx-auto relative">
             <div className="text-center mb-10 sm:mb-14 lg:mb-16">
-              <div className="inline-flex items-center gap-2 bg-[#14B8A6]/10 border border-[#14B8A6]/30 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 mb-4 sm:mb-6 text-xs sm:text-sm text-[#5EEAD4]">
+              <div className="inline-flex items-center gap-2 bg-[#14B8A6]/10 border border-[#14B8A6]/30 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 mb-4 sm:mb-6 text-xs sm:text-sm text-[#0F766E]">
                 <span>שאלות נפוצות</span>
               </div>
 
@@ -1263,7 +1263,7 @@ export default function LandingPage() {
                 יש לך שאלות? <span className="shimmer-text">יש לנו תשובות.</span>
               </h2>
 
-              <p className="text-sm sm:text-base lg:text-xl text-white/70 leading-relaxed max-w-2xl mx-auto">
+              <p className="text-sm sm:text-base lg:text-xl text-[#3F4654] leading-relaxed max-w-2xl mx-auto">
                 התשובות לשאלות הנפוצות שאנחנו מקבלים. אם משהו לא ברור - תמיד אפשר לפנות אלינו.
               </p>
             </div>
@@ -1294,12 +1294,12 @@ export default function LandingPage() {
             </div>
 
             <div className="text-center mt-10 sm:mt-12">
-              <p className="text-sm sm:text-base text-white/60 mb-3 sm:mb-4">
+              <p className="text-sm sm:text-base text-[#3F4654] mb-3 sm:mb-4">
                 יש לך שאלה אחרת?
               </p>
               <a
                 href="#cta"
-                className="inline-block bg-white/5 border border-white/15 text-white font-semibold px-6 sm:px-8 py-3 sm:py-4 rounded-xl text-sm sm:text-base hover:bg-white/10 transition"
+                className="inline-block bg-white/70 border border-black/[0.10] text-[#0F1620] font-semibold px-6 sm:px-8 py-3 sm:py-4 rounded-xl text-sm sm:text-base hover:bg-white/80 transition"
               >
                 בוא נדבר ←
               </a>
@@ -1308,7 +1308,7 @@ export default function LandingPage() {
         </section>
 
         {/* === FOOTER === */}
-        <footer className="relative border-t border-white/10 bg-[#07111A]/60 backdrop-blur-md mt-12">
+        <footer className="relative border-t border-black/[0.08] bg-white/60 backdrop-blur-md mt-12">
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
             <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[700px] h-[300px] bg-[#22D3B0]/8 blur-[140px] rounded-full"></div>
           </div>
@@ -1324,37 +1324,37 @@ export default function LandingPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-xl font-bold">Spike AI</span>
-                    <span className="text-[10px] font-bold tracking-widest text-[#5EEAD4] bg-[#14B8A6]/15 border border-[#14B8A6]/30 px-2 py-0.5 rounded-full">
+                    <span className="text-[10px] font-bold tracking-widest text-[#0F766E] bg-[#14B8A6]/15 border border-[#14B8A6]/30 px-2 py-0.5 rounded-full">
                       AGENTS
                     </span>
                   </div>
                 </div>
-                <p className="text-sm text-white/60 leading-relaxed max-w-xs mx-auto md:mx-0">
+                <p className="text-sm text-[#3F4654] leading-relaxed max-w-xs mx-auto md:mx-0">
                   צוות שעובד בשבילך, בלי לבקש משכורת.
                 </p>
               </div>
 
               {/* עמודה 2: ניווט */}
               <div className="text-center md:text-right">
-                <h4 className="text-sm font-bold text-white/90 mb-4 tracking-wide">ניווט</h4>
+                <h4 className="text-sm font-bold text-[#0F1620] mb-4 tracking-wide">ניווט</h4>
                 <ul className="space-y-2.5">
                   <li>
-                    <a href="#how" className="text-sm text-white/60 hover:text-[#5EEAD4] transition-colors">
+                    <a href="#how" className="text-sm text-[#3F4654] hover:text-[#0F766E] transition-colors">
                       איך זה עובד
                     </a>
                   </li>
                   <li>
-                    <a href="#agents" className="text-sm text-white/60 hover:text-[#5EEAD4] transition-colors">
+                    <a href="#agents" className="text-sm text-[#3F4654] hover:text-[#0F766E] transition-colors">
                       סוכנים
                     </a>
                   </li>
                   <li>
-                    <a href="#pricing" className="text-sm text-white/60 hover:text-[#5EEAD4] transition-colors">
+                    <a href="#pricing" className="text-sm text-[#3F4654] hover:text-[#0F766E] transition-colors">
                       החבילה
                     </a>
                   </li>
                   <li>
-                    <a href="#faq" className="text-sm text-white/60 hover:text-[#5EEAD4] transition-colors">
+                    <a href="#faq" className="text-sm text-[#3F4654] hover:text-[#0F766E] transition-colors">
                       שאלות נפוצות
                     </a>
                   </li>
@@ -1363,25 +1363,25 @@ export default function LandingPage() {
 
               {/* עמודה 3: מידע משפטי */}
               <div className="text-center md:text-right">
-                <h4 className="text-sm font-bold text-white/90 mb-4 tracking-wide">מידע משפטי</h4>
+                <h4 className="text-sm font-bold text-[#0F1620] mb-4 tracking-wide">מידע משפטי</h4>
                 <ul className="space-y-2.5">
                   <li>
-                    <Link href="/privacy" className="text-sm text-white/60 hover:text-[#5EEAD4] transition-colors">
+                    <Link href="/privacy" className="text-sm text-[#3F4654] hover:text-[#0F766E] transition-colors">
                       מדיניות פרטיות
                     </Link>
                   </li>
                   <li>
-                    <Link href="/terms" className="text-sm text-white/60 hover:text-[#5EEAD4] transition-colors">
+                    <Link href="/terms" className="text-sm text-[#3F4654] hover:text-[#0F766E] transition-colors">
                       תנאי שימוש
                     </Link>
                   </li>
                   <li>
-                    <Link href="/cookies" className="text-sm text-white/60 hover:text-[#5EEAD4] transition-colors">
+                    <Link href="/cookies" className="text-sm text-[#3F4654] hover:text-[#0F766E] transition-colors">
                       מדיניות עוגיות
                     </Link>
                   </li>
                   <li>
-                    <Link href="/accessibility" className="text-sm text-white/60 hover:text-[#5EEAD4] transition-colors">
+                    <Link href="/accessibility" className="text-sm text-[#3F4654] hover:text-[#0F766E] transition-colors">
                       הצהרת נגישות
                     </Link>
                   </li>
@@ -1390,15 +1390,15 @@ export default function LandingPage() {
 
               {/* עמודה 4: יצירת קשר */}
               <div className="text-center md:text-right">
-                <h4 className="text-sm font-bold text-white/90 mb-4 tracking-wide">יצירת קשר</h4>
+                <h4 className="text-sm font-bold text-[#0F1620] mb-4 tracking-wide">יצירת קשר</h4>
                 <a
                   href="mailto:spikeaistudio@gmail.com"
-                  className="inline-flex items-center gap-2 text-sm text-white/60 hover:text-[#5EEAD4] transition-colors"
+                  className="inline-flex items-center gap-2 text-sm text-[#3F4654] hover:text-[#0F766E] transition-colors"
                   dir="ltr"
                 >
                   <span>spikeaistudio@gmail.com</span>
                 </a>
-                <p className="text-xs text-white/40 mt-3 leading-relaxed">
+                <p className="text-xs text-[#727988] mt-3 leading-relaxed">
                   נחזור אליך תוך 24 שעות
                 </p>
               </div>
@@ -1406,8 +1406,8 @@ export default function LandingPage() {
             </div>
 
             {/* שורת copyright */}
-            <div className="pt-8 border-t border-white/5 text-center">
-              <p className="text-xs text-white/40">
+            <div className="pt-8 border-t border-black/[0.06] text-center">
+              <p className="text-xs text-[#727988]">
                 © 2026 Spike AI Agents. כל הזכויות שמורות.
               </p>
             </div>
