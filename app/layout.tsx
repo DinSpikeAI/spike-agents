@@ -13,7 +13,7 @@ const SITE_URL = "https://spikeai.co.il";
 const SITE_NAME = "Spike AI Agents";
 const SITE_TITLE = "Spike AI Agents — סוכני AI לעסקים ישראליים";
 const SITE_DESCRIPTION =
-  "צוות שלם של סוכני AI שעובד בשבילך 24/7. דוחות בטלגרם, ניהול רשתות, סינון לידים, ובקרת איכות — בלי הוצאות שכר ובלי כאבי ראש.";
+  "צוות שלם של סוכני AI שעובד בשבילך 24/7. דוחות בוואטסאפ, ניהול רשתות, סינון לידים, ובקרת איכות — בלי הוצאות שכר ובלי כאבי ראש.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
