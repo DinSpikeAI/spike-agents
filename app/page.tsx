@@ -391,7 +391,7 @@ export default function LandingPage() {
         .step-circle { animation: spike-step-pulse 3s ease-in-out infinite; }
         
         .shimmer-text {
-          background: linear-gradient(90deg, #22D3B0 0%, #5BD0F2 25%, #ffffff 50%, #5BD0F2 75%, #22D3B0 100%);
+          background: linear-gradient(90deg, #0F766E 0%, #14B8A6 25%, #0EA5C4 50%, #14B8A6 75%, #0F766E 100%);
           background-size: 200% 100%;
           background-clip: text;
           -webkit-background-clip: text;
@@ -406,18 +406,21 @@ export default function LandingPage() {
           animation: spike-grid-pulse 8s ease-in-out infinite;
         }
         .robot-stage {
-          background: radial-gradient(ellipse at center, rgba(20, 184, 166, 0.3) 0%, rgba(20, 184, 166, 0.12) 30%, transparent 60%);
+          background: radial-gradient(ellipse at center, rgba(20, 184, 166, 0.16) 0%, rgba(91, 208, 242, 0.08) 30%, transparent 65%);
         }
         .step-card, .agent-card, .package-column {
-          background: rgba(255, 255, 255, 0.03);
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: rgba(255, 255, 255, 0.72);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          border: 1px solid rgba(15, 20, 30, 0.08);
+          box-shadow: 0 8px 28px rgba(15,20,30,0.06), 0 1px 3px rgba(15,20,30,0.04);
           transition: all 0.4s ease;
         }
         .step-card:hover {
           transform: translateY(-8px);
           border-color: rgba(34, 211, 176, 0.4);
-          background: rgba(34, 211, 176, 0.04);
+          background: rgba(255, 255, 255, 0.88);
+          box-shadow: 0 16px 44px rgba(15,20,30,0.10);
         }
         .agent-card { position: relative; overflow: hidden; }
         .agent-card::before {
@@ -437,11 +440,13 @@ export default function LandingPage() {
         .agent-card:hover::before { opacity: 1; }
         .agent-card:hover .agent-icon { animation: spike-icon-bounce 0.6s ease; }
         .package-column:hover {
-          background: rgba(255, 255, 255, 0.06);
+          background: rgba(255, 255, 255, 0.88);
           border-color: rgba(34, 211, 176, 0.3);
         }
         .package-hero {
-          background: linear-gradient(135deg, rgba(34, 211, 176, 0.12) 0%, rgba(91, 208, 242, 0.08) 50%, rgba(20, 184, 166, 0.06) 100%);
+          background: rgba(255, 255, 255, 0.78);
+          border: 1px solid rgba(15, 20, 30, 0.08);
+          box-shadow: 0 8px 28px rgba(15,20,30,0.06);
           backdrop-filter: blur(20px);
           animation: spike-package-glow 5s ease-in-out infinite;
           position: relative;
@@ -449,10 +454,7 @@ export default function LandingPage() {
         }
         
         .package-column-premium {
-          background: linear-gradient(135deg, 
-            rgba(34, 211, 176, 0.18) 0%, 
-            rgba(91, 208, 242, 0.12) 50%, 
-            rgba(20, 184, 166, 0.10) 100%);
+          background: rgba(255, 255, 255, 0.86);
           backdrop-filter: blur(15px);
           border: 2px solid rgba(34, 211, 176, 0.5);
           animation: spike-premium-glow 4s ease-in-out infinite;
@@ -477,15 +479,16 @@ export default function LandingPage() {
         }
         
         .cta-form-card {
-          background: linear-gradient(135deg, rgba(34, 211, 176, 0.15) 0%, rgba(91, 208, 242, 0.08) 100%);
+          background: rgba(255, 255, 255, 0.80);
           backdrop-filter: blur(20px);
           border: 1px solid rgba(34, 211, 176, 0.4);
+          box-shadow: 0 8px 28px rgba(15,20,30,0.06);
           animation: spike-package-glow 5s ease-in-out infinite;
         }
         .cta-input {
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgba(255, 255, 255, 0.15);
-          color: white;
+          background: rgba(255, 255, 255, 0.92);
+          border: 1px solid rgba(15, 20, 30, 0.14);
+          color: #0F1620;
           padding: 16px 20px;
           border-radius: 12px;
           width: 100%;
@@ -495,14 +498,14 @@ export default function LandingPage() {
           text-align: right;
           direction: rtl;
         }
-        .cta-input::placeholder { color: rgba(255, 255, 255, 0.4); }
+        .cta-input::placeholder { color: rgba(15, 20, 30, 0.40); }
         .cta-input:focus {
           outline: none;
           border-color: #22D3B0;
-          background: rgba(255, 255, 255, 0.08);
+          background: #ffffff;
           box-shadow: 0 0 0 3px rgba(34, 211, 176, 0.2);
         }
-        .cta-input:hover:not(:focus) { border-color: rgba(255, 255, 255, 0.25); }
+        .cta-input:hover:not(:focus) { border-color: rgba(15, 20, 30, 0.25); }
         .cta-select {
           background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2322D3B0' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
           background-repeat: no-repeat;
@@ -511,13 +514,13 @@ export default function LandingPage() {
           appearance: none;
           -webkit-appearance: none;
         }
-        .cta-select option { background: #07111A; color: white; }
+        .cta-select option { background: #ffffff; color: #0F1620; }
         .success-message { animation: spike-success-pop 0.5s ease; }
         
         .hero-quick-input {
-          background: rgba(255, 255, 255, 0.06);
-          border: 1px solid rgba(255, 255, 255, 0.12);
-          color: white;
+          background: rgba(255, 255, 255, 0.92);
+          border: 1px solid rgba(15, 20, 30, 0.14);
+          color: #0F1620;
           padding: 14px 18px;
           border-radius: 12px;
           width: 100%;
@@ -527,25 +530,25 @@ export default function LandingPage() {
           text-align: right;
           direction: rtl;
         }
-        .hero-quick-input::placeholder { color: rgba(255, 255, 255, 0.45); }
+        .hero-quick-input::placeholder { color: rgba(15, 20, 30, 0.40); }
         .hero-quick-input:focus {
           outline: none;
           border-color: #22D3B0;
-          background: rgba(255, 255, 255, 0.1);
+          background: #ffffff;
           box-shadow: 0 0 0 3px rgba(34, 211, 176, 0.2);
         }
-        .hero-quick-input:hover:not(:focus) { border-color: rgba(255, 255, 255, 0.2); }
+        .hero-quick-input:hover:not(:focus) { border-color: rgba(15, 20, 30, 0.25); }
         
         .faq-item {
-          background: rgba(255, 255, 255, 0.03);
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: rgba(255, 255, 255, 0.72);
+          backdrop-filter: blur(20px);
+          border: 1px solid rgba(15, 20, 30, 0.08);
           transition: all 0.3s ease;
           overflow: hidden;
         }
         .faq-item:hover {
           border-color: rgba(34, 211, 176, 0.3);
-          background: rgba(255, 255, 255, 0.05);
+          background: rgba(255, 255, 255, 0.85);
         }
         .faq-item.faq-open {
           border-color: rgba(34, 211, 176, 0.5);
@@ -563,7 +566,7 @@ export default function LandingPage() {
           cursor: pointer;
           background: transparent;
           border: none;
-          color: white;
+          color: #0F1620;
           font-family: inherit;
         }
         @media (min-width: 640px) {
@@ -591,7 +594,7 @@ export default function LandingPage() {
         }
         .faq-answer {
           padding: 0 20px 20px 20px;
-          color: rgba(255, 255, 255, 0.75);
+          color: #3F4654;
           line-height: 1.7;
           animation: spike-faq-fade-in 0.3s ease;
         }
@@ -678,9 +681,9 @@ export default function LandingPage() {
           height: 18px;
           min-width: 18px;
           margin-top: 2px;
-          border: 2px solid rgba(255, 255, 255, 0.3);
+          border: 2px solid rgba(15, 20, 30, 0.25);
           border-radius: 4px;
-          background: rgba(255, 255, 255, 0.05);
+          background: rgba(255, 255, 255, 0.70);
           cursor: pointer;
           position: relative;
           transition: all 0.2s ease;
