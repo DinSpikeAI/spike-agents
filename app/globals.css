@@ -1,99 +1,77 @@
 @import "tailwindcss";
 
-/* =================================================================
-   Spike landing — Calm Frosted (matched to the engine, Direction D).
-   Light mist background + frosted white glass + dark ink text.
-   Teal/cyan kept as the brand accent (option A).
-   ================================================================= */
-
 @theme inline {
   --font-heebo: var(--font-heebo);
-
-  /* === Calm Frosted base (from engine) === */
-  --color-mist-blue:  #E9EEF8;
-  --color-mist-lilac: #EFE9F4;
-  --color-mist-mint:  #E5EEF0;
-
-  /* === Glass === */
-  --color-glass:      rgba(255, 255, 255, 0.72);
-  --color-glass-deep: rgba(255, 255, 255, 0.86);
-  --color-glass-soft: rgba(255, 255, 255, 0.55);
-
-  /* === Borders === */
-  --color-hairline:   rgba(15, 20, 30, 0.08);
-  --color-hairline-s: rgba(15, 20, 30, 0.14);
-
-  /* === Ink (text) === */
-  --color-ink:   #0F1620;
-  --color-ink-2: #3F4654;
-  --color-ink-3: #727988;
-
-  /* === Brand accent (teal/cyan kept — option A) === */
+  --color-ink-bg: #07111A;
+  --color-ink-bg2: #0B1A22;
+  --color-ink-text: #E8EBFF;
+  --color-teal-50: #F0FDFA;
   --color-teal-300: #5EEAD4;
   --color-teal-400: #22D3B0;
   --color-teal-500: #14B8A6;
   --color-teal-700: #0F766E;
   --color-cyan-300: #5BD0F2;
-  --color-blush:    #FFA4B5;
-
-  /* === Radii === */
-  --radius-sm: 8px;
-  --radius-md: 11px;
-  --radius-lg: 14px;
-  --radius-xl: 18px;
-
-  /* === Shadows (Calm) === */
-  --shadow-glass:       0 1px 0 rgba(255,255,255,0.6) inset, 0 8px 28px rgba(15,20,30,0.06), 0 1px 3px rgba(15,20,30,0.04);
-  --shadow-glass-hover: 0 1px 0 rgba(255,255,255,0.7) inset, 0 16px 44px rgba(15,20,30,0.10), 0 3px 8px rgba(15,20,30,0.05);
+  --color-navy-950: #0a1f2c;
+  --color-blush: #FFA4B5;
 }
 
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+}
 
 body {
-  background: var(--color-mist-blue);
-  color: var(--color-ink);
+  background: #07111A;
+  color: #E8EBFF;
   font-family: var(--font-heebo), sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-/* landing animations (kept) */
-@keyframes spike-float { 0%,100%{transform:translateY(-12px);} 50%{transform:translateY(12px);} }
-@keyframes spike-glow  { 0%,100%{opacity:.4;} 50%{opacity:.7;} }
-@keyframes spike-pulse { 0%,100%{transform:scale(1);opacity:.8;} 50%{transform:scale(1.05);opacity:1;} }
-.animate-spike-float { animation: spike-float 4s ease-in-out infinite; }
-.animate-spike-glow  { animation: spike-glow 3s ease-in-out infinite; }
-.animate-spike-pulse { animation: spike-pulse 3s ease-in-out infinite; }
+@keyframes spike-float {
+  0%, 100% { transform: translateY(-12px); }
+  50%      { transform: translateY(12px); }
+}
 
-::selection { background: #22D3B0; color: #07111A; }
+@keyframes spike-glow {
+  0%, 100% { opacity: 0.4; }
+  50%      { opacity: 0.7; }
+}
 
-/* teal brand gradient text — deepened for contrast on light */
+@keyframes spike-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50%      { transform: scale(1.05); opacity: 1; }
+}
+
+.animate-spike-float {
+  animation: spike-float 4s ease-in-out infinite;
+}
+
+.animate-spike-glow {
+  animation: spike-glow 3s ease-in-out infinite;
+}
+
+.animate-spike-pulse {
+  animation: spike-pulse 3s ease-in-out infinite;
+}
+
+::selection {
+  background: #22D3B0;
+  color: #07111A;
+}
+
 .gradient-text {
-  background: linear-gradient(135deg, #14B8A6 0%, #0EA5C4 100%);
+  background: linear-gradient(135deg, #22D3B0 0%, #5BD0F2 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
-/* frosted white glass card (Calm) */
 .glass-card {
-  background: var(--color-glass);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--color-hairline);
-  box-shadow: var(--shadow-glass);
-  transition: border-color .3s ease, transform .3s ease, box-shadow .3s ease;
-}
-.glass-card:hover {
-  border-color: rgba(20,184,166,0.40);
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-glass-hover);
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: border-color 0.3s ease, transform 0.3s ease;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *,*::before,*::after {
-    animation-duration:.01ms!important;
-    animation-iteration-count:1!important;
-    transition-duration:.01ms!important;
-  }
+.glass-card:hover {
+  border-color: rgba(20, 184, 166, 0.4);
+  transform: translateY(-4px);
 }

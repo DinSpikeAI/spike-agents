@@ -88,7 +88,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#E9EEF8",
+  themeColor: "#07111A",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
@@ -105,25 +105,6 @@ export default function RootLayout({
         className={`${heebo.variable} antialiased`}
         style={{ fontFamily: "var(--font-heebo)" }}
       >
-        {/* Calm Frosted background — three soft blobs behind everything (matches engine AppleBg) */}
-        <div
-          aria-hidden
-          className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
-          style={{ background: "#E9EEF8" }}
-        >
-          <div
-            className="absolute -top-[120px] -end-[100px] h-[520px] w-[520px] rounded-full"
-            style={{ background: "radial-gradient(circle, rgba(184,206,255,0.85), rgba(184,206,255,0) 70%)" }}
-          />
-          <div
-            className="absolute top-[220px] -start-[120px] h-[480px] w-[480px] rounded-full"
-            style={{ background: "radial-gradient(circle, rgba(214,189,233,0.75), rgba(214,189,233,0) 70%)" }}
-          />
-          <div
-            className="absolute -bottom-[180px] end-[200px] h-[600px] w-[600px] rounded-full"
-            style={{ background: "radial-gradient(circle, rgba(178,221,206,0.6), rgba(178,221,206,0) 70%)" }}
-          />
-        </div>
         {children}
       </body>
     </html>
