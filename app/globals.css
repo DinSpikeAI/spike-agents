@@ -1,18 +1,109 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ============================================================
+   Spike AI — art-directed landing
+   Three zones: DARK (premium OLED) -> LIGHT (product) -> COLORFUL (shader).
+   Monochrome base; white is the accent. Depth from light + type.
+   shadcn tokens kept for the light zone + shadcn primitives; the dark
+   UI uses its own --bg / --surface / --line tokens so the two systems
+   never collide.
+   ============================================================ */
 
 @theme inline {
   --font-heebo: var(--font-heebo);
-  --color-ink-bg: #07111A;
-  --color-ink-bg2: #0B1A22;
-  --color-ink-text: #E8EBFF;
-  --color-teal-50: #F0FDFA;
-  --color-teal-300: #5EEAD4;
-  --color-teal-400: #22D3B0;
-  --color-teal-500: #14B8A6;
-  --color-teal-700: #0F766E;
-  --color-cyan-300: #5BD0F2;
-  --color-navy-950: #0a1f2c;
-  --color-blush: #FFA4B5;
+  --font-grotesk: var(--font-grotesk);
+  --font-heading: var(--font-sans);
+  --font-sans: var(--font-sans);
+
+  --color-bg: #08090a;
+  --color-bg-elev: #0e0f11;
+  --color-text: #ffffff;
+  --color-text-2: #a1a1a6;
+  --color-text-3: #86868b;
+
+  /* shadcn token bridge */
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+}
+
+:root {
+  /* Dark UI tokens (own namespace — independent of shadcn --border etc.) */
+  --bg: #08090a;
+  --bg-elev: #0e0f11;
+  --surface: rgba(255, 255, 255, 0.04);
+  --surface-hi: rgba(255, 255, 255, 0.07);
+  --line: rgba(255, 255, 255, 0.10);
+  --line-hi: rgba(255, 255, 255, 0.22);
+  --text: #ffffff;
+  --text-2: #a1a1a6;
+  --text-3: #86868b;
+  --glow: rgba(255, 255, 255, 0.06);
+
+  /* Brand accent — the robot's blue-teal (Spike identity) */
+  --brand: #22d3b0;
+  --brand-2: #5bd0f2;
+  --brand-soft: #5eead4;
+  --brand-ink: #06201c; /* dark ink for text on the teal CTA */
+
+  /* shadcn (light) tokens */
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
 }
 
 html {
@@ -20,58 +111,289 @@ html {
 }
 
 body {
-  background: #07111A;
-  color: #E8EBFF;
-  font-family: var(--font-heebo), sans-serif;
-}
-
-@keyframes spike-float {
-  0%, 100% { transform: translateY(-12px); }
-  50%      { transform: translateY(12px); }
-}
-
-@keyframes spike-glow {
-  0%, 100% { opacity: 0.4; }
-  50%      { opacity: 0.7; }
-}
-
-@keyframes spike-pulse {
-  0%, 100% { transform: scale(1); opacity: 0.8; }
-  50%      { transform: scale(1.05); opacity: 1; }
-}
-
-.animate-spike-float {
-  animation: spike-float 4s ease-in-out infinite;
-}
-
-.animate-spike-glow {
-  animation: spike-glow 3s ease-in-out infinite;
-}
-
-.animate-spike-pulse {
-  animation: spike-pulse 3s ease-in-out infinite;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-heebo), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 ::selection {
-  background: #22D3B0;
-  color: #07111A;
+  background: #ffffff;
+  color: #08090a;
 }
 
-.gradient-text {
-  background: linear-gradient(135deg, #22D3B0 0%, #5BD0F2 100%);
+/* Latin-only display accent (wordmark, numerals, tags) */
+.font-grotesk {
+  font-family: var(--font-grotesk), var(--font-heebo), sans-serif;
+}
+
+/* ---------- Focus (WCAG AA / IS 5568) ---------- */
+*:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.85);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+/* Light zone: dark focus ring for contrast */
+.zone-light *:focus-visible {
+  outline-color: rgba(10, 10, 10, 0.8);
+}
+
+/* ============================================================
+   LIGHT ZONE
+   ============================================================ */
+.zone-light {
+  background: #f5f5f7;
+  color: #0a0a0a;
+}
+.zone-light .text-soft {
+  color: #4b4b4f;
+}
+
+/* ---------- Liquid glass surfaces (dark) ---------- */
+.glass {
+  background: var(--surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--line);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: background-color 0.3s ease, border-color 0.3s ease,
+    transform 0.3s ease, box-shadow 0.3s ease;
+}
+.glass-hover:hover {
+  background: var(--surface-hi);
+  border-color: var(--line-hi);
+  transform: translateY(-4px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 24px 60px rgba(0, 0, 0, 0.5);
+}
+
+/* ---------- Eyebrow label ---------- */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: var(--brand-soft);
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(34, 211, 176, 0.28);
+  background: rgba(34, 211, 176, 0.08);
+}
+.zone-light .eyebrow {
+  color: #0f766e;
+  border-color: rgba(15, 118, 110, 0.28);
+  background: rgba(15, 118, 110, 0.07);
+}
+
+/* ---------- Buttons ---------- */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-2) 100%);
+  color: var(--brand-ink);
+  font-weight: 800;
+  border-radius: 12px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
+  box-shadow: 0 8px 30px rgba(34, 211, 176, 0.28);
+  cursor: pointer;
+}
+.btn-primary:hover {
+  filter: brightness(1.06);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 44px rgba(34, 211, 176, 0.45);
+}
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.04);
+  color: #ffffff;
+  font-weight: 600;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+  cursor: pointer;
+}
+.btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--line-hi);
+}
+
+/* ---------- Form fields (monochrome dark) ---------- */
+.field {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line);
+  color: #ffffff;
+  width: 100%;
+  border-radius: 12px;
+  font-size: 16px; /* prevents iOS zoom */
+  font-family: inherit;
+  text-align: right;
+  direction: rtl;
+  transition: border-color 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease;
+}
+.field::placeholder {
+  color: rgba(255, 255, 255, 0.38);
+}
+.field:hover:not(:focus) {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+.field:focus {
+  outline: none;
+  border-color: rgba(34, 211, 176, 0.7);
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: 0 0 0 3px rgba(34, 211, 176, 0.22);
+}
+.field-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 16px center;
+  padding-left: 40px !important;
+}
+.field-select option {
+  background: #0e0f11;
+  color: #ffffff;
+}
+
+/* ---------- Kinetic headline emphasis (grayscale sheen) ---------- */
+.sheen {
+  background: linear-gradient(
+    100deg,
+    var(--brand) 0%,
+    var(--brand-2) 30%,
+    #ffffff 50%,
+    var(--brand-2) 70%,
+    var(--brand) 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: sheen-sweep 6s ease-in-out infinite;
+}
+.zone-light .sheen {
+  background: linear-gradient(100deg, #0f766e 0%, #0369a1 45%, #0f766e 60%, #14b8a6 100%);
+  background-size: 200% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
-
-.glass-card {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  transition: border-color 0.3s ease, transform 0.3s ease;
+@keyframes sheen-sweep {
+  0%, 100% { background-position: 0% 0; }
+  50% { background-position: 100% 0; }
 }
 
-.glass-card:hover {
-  border-color: rgba(20, 184, 166, 0.4);
-  transform: translateY(-4px);
+/* ---------- Hairline divider ---------- */
+.hairline {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.18), transparent);
+}
+
+/* ---------- Ambient grayscale glow ---------- */
+.ambient {
+  position: absolute;
+  border-radius: 9999px;
+  pointer-events: none;
+  background: radial-gradient(
+    circle,
+    rgba(34, 211, 176, 0.12) 0%,
+    rgba(91, 208, 242, 0.05) 40%,
+    transparent 70%
+  );
+  filter: blur(70px);
+}
+.ambient.ambient-cyan {
+  background: radial-gradient(
+    circle,
+    rgba(91, 208, 242, 0.12) 0%,
+    rgba(34, 211, 176, 0.04) 40%,
+    transparent 70%
+  );
+}
+
+/* ---------- Film grain ---------- */
+.grain::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---------- Premium card edge shimmer (package core) ---------- */
+.edge-shimmer { position: relative; }
+.edge-shimmer::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    130deg,
+    rgba(255, 255, 255, 0.5),
+    rgba(255, 255, 255, 0.05) 35%,
+    rgba(255, 255, 255, 0.05) 65%,
+    rgba(255, 255, 255, 0.5)
+  );
+  background-size: 200% 200%;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: edge-sweep 7s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes edge-sweep {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* ---------- Reduced motion: snap to final state ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .sheen { background-position: 0 0 !important; }
+}
+
+/* shadcn dark token set (used by .dark scope if ever needed) */
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
 }

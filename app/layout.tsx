@@ -1,11 +1,22 @@
 import type { Metadata, Viewport } from "next";
-import { Heebo } from "next/font/google";
+import { Heebo, Space_Grotesk, Inter } from "next/font/google";
 import "./globals.css";
+import { cn } from "@/lib/utils";
+
+const inter = Inter({subsets:['latin'],variable:'--font-sans'});
 
 const heebo = Heebo({
   variable: "--font-heebo",
   subsets: ["hebrew", "latin"],
   weight: ["300", "400", "500", "600", "700", "800", "900"],
+  display: "swap",
+});
+
+// Latin-only display accent: wordmark, step numerals, tags.
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-grotesk",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -88,7 +99,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#07111A",
+  themeColor: "#08090A",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
@@ -100,9 +111,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="he" dir="rtl">
+    <html lang="he" dir="rtl" className={cn("font-sans", inter.variable)}>
       <body
-        className={`${heebo.variable} antialiased`}
+        className={`${heebo.variable} ${spaceGrotesk.variable} antialiased`}
         style={{ fontFamily: "var(--font-heebo)" }}
       >
         {children}

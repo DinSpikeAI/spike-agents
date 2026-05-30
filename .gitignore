@@ -54,3 +54,6 @@ desktop.ini
 # python bytecode cache
 __pycache__/
 *.pyc
+
+# dev server log
+.dev.log
