@@ -3,9 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useMotionValue, useReducedMotion, useScroll, useSpring } from "framer-motion";
-import { ContainerScroll } from "@/components/ui/container-scroll-animation";
-import { WebGLShader } from "@/components/ui/web-gl-shader";
+import { AnimatePresence, motion, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform, type MotionValue } from "framer-motion";
 import { LiquidButton } from "@/components/ui/liquid-glass-button";
 
 const WEB3FORMS_KEY = "0b0d2e56-49e7-443f-b4bc-444c083b01ac";
@@ -303,8 +301,8 @@ function ScrollProgress() {
       className="fixed top-0 inset-x-0 z-[70] h-[2.5px] origin-right pointer-events-none"
       style={{
         scaleX,
-        background: "linear-gradient(to left, #22D3B0, #5EEAD4 50%, #5BD0F2)",
-        boxShadow: "0 0 12px rgba(34,211,176,0.55)",
+        background: "linear-gradient(to left, #11c39e, #8b5cf6 55%, #e36bdf)",
+        boxShadow: "0 0 12px rgba(139,92,246,0.45)",
       }}
     />
   );
@@ -526,6 +524,133 @@ function PhoneFrame({
 }
 
 
+
+/* ===== Ribbon of approval cards (hero, TIDY-style) ===== */
+const ribbonGrads = [
+  "linear-gradient(135deg,#11c39e,#4cc6f0)",
+  "linear-gradient(135deg,#8b5cf6,#e36bdf)",
+  "linear-gradient(135deg,#4cc6f0,#8b5cf6)",
+  "linear-gradient(135deg,#e36bdf,#f472b6)",
+  "linear-gradient(135deg,#0a8f76,#11c39e)",
+];
+
+function CardRibbon({ className }: { className?: string }) {
+  const N = 24;
+  return (
+    <div className={"ribbon-wrap " + (className ?? "")} aria-hidden>
+      {Array.from({ length: N }).map((_, i) => {
+        const t = i / (N - 1);
+        const left = 2 + t * 96;
+        const y = Math.sin(t * Math.PI * 1.7) * 44;
+        const rz = Math.cos(t * Math.PI * 1.7) * 34;
+        return (
+          <div
+            key={i}
+            className="ribbon-card"
+            style={{
+              left: `${left}%`,
+              top: `calc(50% + ${y}px)`,
+              background: ribbonGrads[i % ribbonGrads.length],
+              transform: `translate(-50%,-50%) rotateY(-26deg) rotateZ(${rz}deg)`,
+              animationDelay: `${-(i * 0.22)}s`,
+              zIndex: 30 - (i % 7),
+            }}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
+/* ===== Scroll-driven 3D dashboard canvas ===== */
+const canvasCards = [
+  { label: "ליד חם · דנה כהן", grad: ribbonGrads[0], pos: "top-[10%] right-[4%]", range: [0.16, 0.48] as [number, number] },
+  { label: "ביקורת 5★ בגוגל", grad: ribbonGrads[1], pos: "top-[26%] left-[3%]", range: [0.24, 0.56] as [number, number] },
+  { label: "פוסט מוכן לאישור", grad: ribbonGrads[2], pos: "bottom-[20%] right-[8%]", range: [0.32, 0.64] as [number, number] },
+  { label: "מלאי: 3 פריטים אוזלים", grad: ribbonGrads[4], pos: "bottom-[10%] left-[7%]", range: [0.4, 0.72] as [number, number] },
+];
+
+function FloatCard({ p, cfg }: { p: MotionValue<number>; cfg: (typeof canvasCards)[number] }) {
+  const y = useTransform(p, cfg.range, [90, -14]);
+  const opacity = useTransform(p, [cfg.range[0], cfg.range[0] + 0.12], [0, 1]);
+  const rotate = useTransform(p, cfg.range, [8, -3]);
+  return (
+    <motion.div style={{ y, opacity, rotate }} className={`absolute ${cfg.pos} z-20 hidden sm:block`}>
+      <div
+        className="rounded-xl px-3.5 py-2.5 text-xs font-bold text-white border border-white/40 shadow-[0_16px_34px_-10px_rgba(11,20,17,0.45)]"
+        style={{ background: cfg.grad }}
+      >
+        {cfg.label}
+      </div>
+    </motion.div>
+  );
+}
+
+function CanvasScroll({ reduceMotion }: { reduceMotion: boolean }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
+  const rotateX = useTransform(scrollYProgress, [0, 0.55], [52, 0]);
+  const rotateZ = useTransform(scrollYProgress, [0, 0.55], [-7, 0]);
+  const scale = useTransform(scrollYProgress, [0, 0.55], [0.84, 1]);
+  const phrase1 = useTransform(scrollYProgress, [0.05, 0.18], [0, 1]);
+  const phrase2 = useTransform(scrollYProgress, [0.22, 0.36], [0, 1]);
+  const phrase3 = useTransform(scrollYProgress, [0.42, 0.56], [0, 1]);
+
+  if (reduceMotion) {
+    return (
+      <div className="relative py-10">
+        <div className="plot-bg absolute inset-0 rounded-[2rem]" aria-hidden />
+        <div className="relative z-10 mb-8 text-center space-y-1.5">
+          <p className="text-lg sm:text-2xl font-black">מסמן לידים חמים.</p>
+          <p className="text-lg sm:text-2xl font-black">מנסח תשובות וטיוטות.</p>
+          <p className="text-lg sm:text-2xl font-black"><span className="hl">ומחכה לאישור שלך.</span></p>
+        </div>
+        <div className="relative z-10 w-full max-w-[1000px] mx-auto px-4">
+          <BrowserFrame tone="light" src="/shots/agents.png" alt="דשבורד הסוכנים של Spike - כל הסוכנים, סטטוסים והרצה ידנית במסך אחד" width={2000} height={1137} label="app.spikeai.co.il/dashboard" />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div ref={ref} className="relative h-[210vh]">
+      <div className="sticky top-0 h-screen flex flex-col items-center justify-center overflow-hidden">
+        <div className="plot-bg absolute inset-4 sm:inset-10 rounded-[2rem]" aria-hidden />
+
+        <div className="relative z-10 mb-6 sm:mb-9 text-center space-y-1.5 px-4">
+          <motion.p style={{ opacity: phrase1 }} className="text-lg sm:text-2xl lg:text-3xl font-black">
+            מסמן לידים חמים.
+          </motion.p>
+          <motion.p style={{ opacity: phrase2 }} className="text-lg sm:text-2xl lg:text-3xl font-black">
+            מנסח תשובות וטיוטות.
+          </motion.p>
+          <motion.p style={{ opacity: phrase3 }} className="text-lg sm:text-2xl lg:text-3xl font-black">
+            <span className="hl">ומחכה לאישור שלך.</span>
+          </motion.p>
+        </div>
+
+        <div className="relative z-10 w-full max-w-[1000px] px-4 [perspective:1400px]">
+          <motion.div style={{ rotateX, rotateZ, scale, transformStyle: "preserve-3d" }} className="will-change-transform">
+            <BrowserFrame
+              tone="light"
+              src="/shots/agents.png"
+              alt="דשבורד הסוכנים של Spike - כל הסוכנים, סטטוסים והרצה ידנית במסך אחד"
+              width={2000}
+              height={1137}
+              label="app.spikeai.co.il/dashboard"
+            />
+          </motion.div>
+          {canvasCards.map((cfg, i) => (
+            <FloatCard key={i} p={scrollYProgress} cfg={cfg} />
+          ))}
+        </div>
+
+        <span className="relative z-10 mt-6 sm:mt-8 text-[11px] tracking-[0.25em] font-bold text-[var(--ink-3)]">↓ גלול</span>
+      </div>
+    </div>
+  );
+}
+
 /* ===== Sticker badge ===== */
 function Sticker({ children, className }: { children: React.ReactNode; className?: string }) {
   return <span className={"sticker " + (className ?? "")}>{children}</span>;
@@ -596,12 +721,12 @@ function ApprovalDemo() {
   return (
     <div className="relative w-full max-w-[460px] mx-auto">
       <div className="flex items-center justify-between mb-3 px-1">
-        <span className="flex items-center gap-2 text-sm font-bold text-white/90">
+        <span className="flex items-center gap-2 text-sm font-bold text-[var(--ink)]">
           <span className="pulse-dot" aria-hidden />
           תיבת האישורים שלך
         </span>
-        <span className="font-grotesk text-xs text-white/55" dir="ltr">
-          <span className="text-[var(--teal-soft)] font-bold">{approved}</span> אושרו היום
+        <span className="font-grotesk text-xs text-[var(--ink-3)]" dir="ltr">
+          <span className="text-[var(--teal-deep)] font-bold">{approved}</span> אושרו היום
         </span>
       </div>
 
@@ -612,18 +737,18 @@ function ApprovalDemo() {
           animate={{ opacity: 1, y: 0, rotate: 0 }}
           exit={reduce ? undefined : { opacity: 0, y: -46, rotate: -4 }}
           transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
-          className="card-live glass rounded-3xl p-5 sm:p-6 relative"
+          className="card-live card-lite rounded-3xl p-5 sm:p-6 relative"
         >
           <div className="flex items-center justify-between mb-4">
-            <span className="font-bold text-white">{item.from}</span>
+            <span className="font-bold text-[var(--ink)]">{item.from}</span>
             <span className="sticker sticker-teal !rotate-0 text-[11px] !py-1 !px-2.5">{item.tag}</span>
           </div>
 
-          <div className="rounded-2xl rounded-tr-sm bg-white/[0.07] border border-white/10 px-4 py-3 text-sm leading-relaxed text-white/90 mb-3 w-fit max-w-[92%]">
+          <div className="rounded-2xl rounded-tr-sm bg-[rgba(11,20,17,0.05)] border border-[var(--line)] px-4 py-3 text-sm leading-relaxed text-[var(--ink)] mb-3 w-fit max-w-[92%]">
             {item.msg}
           </div>
 
-          <p className="text-[11px] font-bold tracking-wide text-[var(--teal-soft)] mb-1.5">Spike ניסח עבורך:</p>
+          <p className="text-[11px] font-bold tracking-wide text-[var(--teal-deep)] mb-1.5">Spike ניסח עבורך:</p>
           <div className="rounded-2xl rounded-tl-sm bg-[var(--teal)] text-[var(--ink)] font-semibold px-4 py-3 text-sm leading-relaxed mb-5 w-fit max-w-[92%] mr-auto">
             {item.draft}
           </div>
@@ -652,7 +777,7 @@ function ApprovalDemo() {
         )}
       </AnimatePresence>
 
-      <p className="mt-3 text-center text-[11px] text-white/40">דמו אינטראקטיבי · נתונים להמחשה בלבד</p>
+      <p className="mt-3 text-center text-[11px] text-[var(--ink-3)]">דמו אינטראקטיבי · נתונים להמחשה בלבד</p>
     </div>
   );
 }
@@ -818,39 +943,39 @@ export default function LandingPage() {
           height: 18px;
           min-width: 18px;
           margin-top: 2px;
-          border: 2px solid rgba(255, 255, 255, 0.3);
+          border: 2px solid rgba(11, 20, 17, 0.3);
           border-radius: 5px;
-          background: rgba(255, 255, 255, 0.04);
+          background: #ffffff;
           cursor: pointer;
           position: relative;
           transition: all 0.2s ease;
           flex-shrink: 0;
         }
-        .consent-box:hover { border-color: rgba(255, 255, 255, 0.6); }
-        .consent-box:checked { background: #16d3ab; border-color: #16d3ab; }
+        .consent-box:hover { border-color: rgba(11, 20, 17, 0.55); }
+        .consent-box:checked { background: #11c39e; border-color: #11c39e; }
         .consent-box:checked::after {
           content: "✓";
           position: absolute;
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%);
-          color: #04100d;
+          color: #ffffff;
           font-weight: 900;
           font-size: 12px;
           line-height: 1;
         }
       `}</style>
 
-      <div className="grain relative overflow-x-clip">
+      <div className="relative overflow-x-clip">
         <ScrollProgress />
 
-        {/* ===== NAV (floating pill) ===== */}
+        {/* ===== NAV ===== */}
         <nav dir="rtl" className="fixed top-0 inset-x-0 z-50 px-3 sm:px-6 pt-3">
           <div
             className={`max-w-[1200px] mx-auto flex items-center justify-between gap-2 rounded-2xl border px-3 sm:px-5 py-2.5 backdrop-blur-xl transition-[background-color,border-color,box-shadow] duration-300 ${
               scrolled
-                ? "bg-[#04100d]/85 border-white/12 shadow-[0_10px_30px_-12px_rgba(0,0,0,0.7)]"
-                : "bg-[#04100d]/55 border-white/[0.07]"
+                ? "bg-white/85 border-[rgba(11,20,17,0.12)] shadow-[0_10px_30px_-14px_rgba(11,20,17,0.35)]"
+                : "bg-white/60 border-[rgba(11,20,17,0.07)]"
             }`}
           >
             <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
@@ -858,8 +983,8 @@ export default function LandingPage() {
                 <Image src="/spike-mascot.png" alt="Spike AI" fill sizes="36px" className="object-contain mascot-mono" />
               </div>
               <div className="flex items-center gap-2">
-                <span className="font-grotesk text-base sm:text-lg font-bold tracking-tight text-white">Spike AI</span>
-                <span className="font-grotesk hidden sm:inline-block text-[10px] font-medium tracking-[0.25em] text-[var(--teal-soft)] border border-[rgba(22,211,171,0.35)] px-2 py-0.5 rounded-full">
+                <span className="font-grotesk text-base sm:text-lg font-bold tracking-tight text-[var(--ink)]">Spike AI</span>
+                <span className="font-grotesk hidden sm:inline-block text-[10px] font-medium tracking-[0.25em] text-[var(--teal-deep)] border border-[rgba(10,143,118,0.35)] px-2 py-0.5 rounded-full">
                   AGENTS
                 </span>
               </div>
@@ -867,7 +992,7 @@ export default function LandingPage() {
 
             <div className="hidden md:flex items-center gap-7">
               {navLinks.map((l) => (
-                <a key={l.href} href={l.href} className="text-sm text-white/60 hover:text-white transition-colors">
+                <a key={l.href} href={l.href} className="text-sm text-[var(--ink-2)] hover:text-[var(--ink)] transition-colors">
                   {l.label}
                 </a>
               ))}
@@ -882,23 +1007,23 @@ export default function LandingPage() {
               aria-label="פתיחת תפריט"
               aria-expanded={mobileMenuOpen}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden flex flex-col justify-center items-center w-10 h-10 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition flex-shrink-0 cursor-pointer"
+              className="md:hidden flex flex-col justify-center items-center w-10 h-10 rounded-lg bg-[rgba(11,20,17,0.04)] border border-[var(--line)] hover:bg-[rgba(11,20,17,0.08)] transition flex-shrink-0 cursor-pointer"
             >
-              <span className={`block w-5 h-0.5 bg-white transition-transform ${mobileMenuOpen ? "rotate-45 translate-y-1" : ""}`}></span>
-              <span className={`block w-5 h-0.5 bg-white mt-1 transition-opacity ${mobileMenuOpen ? "opacity-0" : ""}`}></span>
-              <span className={`block w-5 h-0.5 bg-white mt-1 transition-transform ${mobileMenuOpen ? "-rotate-45 -translate-y-1.5" : ""}`}></span>
+              <span className={`block w-5 h-0.5 bg-[var(--ink)] transition-transform ${mobileMenuOpen ? "rotate-45 translate-y-1" : ""}`}></span>
+              <span className={`block w-5 h-0.5 bg-[var(--ink)] mt-1 transition-opacity ${mobileMenuOpen ? "opacity-0" : ""}`}></span>
+              <span className={`block w-5 h-0.5 bg-[var(--ink)] mt-1 transition-transform ${mobileMenuOpen ? "-rotate-45 -translate-y-1.5" : ""}`}></span>
             </button>
           </div>
 
           {mobileMenuOpen && (
-            <div className="md:hidden max-w-[1200px] mx-auto mt-2 rounded-2xl border border-white/10 bg-[#04100d]/95 backdrop-blur-xl overflow-hidden">
+            <div className="md:hidden max-w-[1200px] mx-auto mt-2 rounded-2xl border border-[var(--line)] bg-white/95 backdrop-blur-xl overflow-hidden shadow-xl">
               <div className="px-4 py-4 flex flex-col gap-1">
                 {navLinks.map((l) => (
                   <a
                     key={l.href}
                     href={l.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="text-base text-white/80 hover:text-white transition py-3 px-3 rounded-lg hover:bg-white/5 text-right"
+                    className="text-base text-[var(--ink-2)] hover:text-[var(--ink)] transition py-3 px-3 rounded-lg hover:bg-[rgba(11,20,17,0.04)] text-right"
                   >
                     {l.label}
                   </a>
@@ -911,22 +1036,32 @@ export default function LandingPage() {
           )}
         </nav>
 
-        {/* ===== HERO — ink, with the interactive approval demo ===== */}
-        <section dir="rtl" className="zone-ink relative overflow-hidden pt-28 sm:pt-32 lg:pt-36 pb-16 sm:pb-24 px-4 sm:px-6 lg:px-12">
+        {/* ===== HERO ===== */}
+        <section dir="rtl" className="relative overflow-hidden pt-28 sm:pt-32 lg:pt-36 pb-14 sm:pb-20 px-4 sm:px-6 lg:px-12">
           <div className="aurora" aria-hidden />
           <div className="max-w-[1240px] mx-auto relative">
-            <div className="grid lg:grid-cols-2 gap-12 lg:gap-10 items-center">
-              {/* Interactive demo + mascot */}
+            <div className="flex items-center justify-between mb-6 sm:mb-8">
+              <span className="idx" dir="ltr">001 — 006</span>
+              <span className="hidden sm:inline-flex eyebrow">
+                <span className="pulse-dot" aria-hidden />
+                <span>חדש בישראל</span>
+              </span>
+            </div>
+
+            <div className="grid lg:grid-cols-2 gap-14 lg:gap-8 items-center">
+              {/* Demo + ribbon */}
               <div className="relative order-2 lg:order-1">
-                <div className="relative h-[140px] sm:h-[175px] flex items-end justify-center -mb-6 z-10 pointer-events-none">
-                  <div className="mascot-halo" aria-hidden />
-                  <div className="drift w-[140px] sm:w-[175px]">
+                <div className="absolute -inset-x-8 sm:-inset-x-14 top-1/2 -translate-y-1/2 h-[320px] sm:h-[380px]" aria-hidden>
+                  <CardRibbon />
+                </div>
+                <div className="relative h-[120px] sm:h-[150px] flex items-end justify-center -mb-5 z-10 pointer-events-none">
+                  <div className="drift w-[120px] sm:w-[150px]">
                     <Image src="/spike-mascot-pro.png" alt="Spike AI" width={520} height={520} priority className="w-full h-auto mascot-mono" />
                   </div>
-                  <span aria-hidden className="float-dot absolute top-[6%] right-[18%] w-1.5 h-1.5" />
-                  <span aria-hidden className="float-dot absolute top-[44%] left-[16%] w-2 h-2" style={{ animationDelay: "-2.4s" }} />
                 </div>
-                <ApprovalDemo />
+                <div className="relative z-10">
+                  <ApprovalDemo />
+                </div>
               </div>
 
               {/* Copy + quick form */}
@@ -937,19 +1072,19 @@ export default function LandingPage() {
                   transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                   className="mb-6"
                 >
-                  <Sticker>חדש בישראל · לא עוד בוט. סוכן.</Sticker>
+                  <Sticker>לא עוד בוט. סוכן.</Sticker>
                 </motion.div>
 
-                <h1 className="text-[clamp(2.6rem,6.2vw,4.9rem)] font-black leading-[1.06] tracking-[-0.03em] mb-6">
+                <h1 className="text-[clamp(2.5rem,5.8vw,4.6rem)] font-black leading-[1.06] tracking-[-0.03em] mb-6">
                   <RiseWords text="צוות שלם שעובד בשבילך," />{" "}
-                  <RiseWords text="בלי לבקש משכורת" wordClass="hl" delay={0.32} />
+                  <RiseWords text="בלי לבקש משכורת" wordClass="grad-text" delay={0.32} />
                 </h1>
 
                 <motion.p
                   initial={reduceMotion ? false : { opacity: 0, y: 14 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.7, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                  className="text-base sm:text-lg lg:text-xl text-[var(--text-2)] leading-relaxed mb-7 sm:mb-8 max-w-2xl"
+                  className="text-base sm:text-lg lg:text-xl text-[var(--ink-2)] leading-relaxed mb-7 sm:mb-8 max-w-2xl"
                 >
                   סוכני Spike עושים את העבודה שפעם היית משלם עליה אלפים: מניהול הרשתות ועד סינון לידים ובקרת איכות. כל העסק שלך מתופעל 24/7, בלי הוצאות שכר ובלי כאבי ראש.
                 </motion.p>
@@ -968,51 +1103,59 @@ export default function LandingPage() {
                     <input type="email" name="email" value={heroForm.email} onChange={handleHeroChange} placeholder="אימייל" required className="field px-4 py-3.5" aria-label="אימייל" />
 
                     {heroError && (
-                      <div className="rounded-xl border border-white/25 bg-white/5 px-4 py-3 text-sm text-white/90 text-center">{heroError}</div>
+                      <div className="rounded-xl border border-[var(--line-hi)] bg-[rgba(11,20,17,0.04)] px-4 py-3 text-sm text-[var(--ink)] text-center">{heroError}</div>
                     )}
                     <button type="submit" disabled={heroSubmitting} className="w-full btn-primary px-8 py-4 text-base">
                       {heroSubmitting ? "שולח..." : "קבל הצעה אישית"}
                     </button>
-                    <p className="text-xs text-white/45 text-center">נחזור אליך תוך 24 שעות. בלי התחייבות.</p>
-                    <p className="text-[11px] text-white/35 text-center leading-relaxed mt-2">
+                    <p className="text-xs text-[var(--ink-3)] text-center">נחזור אליך תוך 24 שעות. בלי התחייבות.</p>
+                    <p className="text-[11px] text-[var(--ink-3)] text-center leading-relaxed mt-2">
                       בלחיצה על &quot;קבל הצעה אישית&quot; אני מסכים/ה ל
-                      <Link href="/privacy" target="_blank" rel="noopener" className="text-white/55 hover:text-white underline underline-offset-2">מדיניות הפרטיות</Link>
+                      <Link href="/privacy" target="_blank" rel="noopener" className="text-[var(--ink-2)] hover:text-[var(--ink)] underline underline-offset-2">מדיניות הפרטיות</Link>
                       {" "}ול
-                      <Link href="/terms" target="_blank" rel="noopener" className="text-white/55 hover:text-white underline underline-offset-2">תנאי השימוש</Link>.
+                      <Link href="/terms" target="_blank" rel="noopener" className="text-[var(--ink-2)] hover:text-[var(--ink)] underline underline-offset-2">תנאי השימוש</Link>.
                     </p>
                   </form>
                 ) : (
-                  <div className="glass rounded-2xl p-6 mb-6 text-center">
+                  <div className="card-lite rounded-2xl p-6 mb-6 text-center">
                     <h3 className="text-2xl font-black mb-2">תודה <span className="hl">{heroForm.name}!</span></h3>
-                    <p className="text-base text-white/75">קיבלנו את הפרטים. נחזור אליך תוך 24 שעות.</p>
+                    <p className="text-base text-[var(--ink-2)]">קיבלנו את הפרטים. נחזור אליך תוך 24 שעות.</p>
                   </div>
                 )}
                 </motion.div>
 
-                <div className="flex flex-wrap gap-x-6 sm:gap-x-8 gap-y-2 text-xs sm:text-sm text-white/55">
-                  <span className="flex items-center gap-1.5"><Check className="text-[var(--teal-soft)]" />הקמה תוך 7 ימים</span>
-                  <span className="flex items-center gap-1.5"><Check className="text-[var(--teal-soft)]" />בלי התחייבות</span>
-                  <span className="flex items-center gap-1.5"><Check className="text-[var(--teal-soft)]" />עברית מלאה</span>
+                <div className="flex flex-wrap gap-x-6 sm:gap-x-8 gap-y-2 text-xs sm:text-sm text-[var(--ink-2)]">
+                  <span className="flex items-center gap-1.5"><Check className="text-[var(--teal-deep)]" />הקמה תוך 7 ימים</span>
+                  <span className="flex items-center gap-1.5"><Check className="text-[var(--teal-deep)]" />בלי התחייבות</span>
+                  <span className="flex items-center gap-1.5"><Check className="text-[var(--teal-deep)]" />עברית מלאה</span>
                 </div>
               </div>
+            </div>
+
+            <div className="mt-12 sm:mt-14 flex items-center gap-2 text-[var(--ink-3)]">
+              <span aria-hidden>↓</span>
+              <span className="text-[11px] tracking-[0.25em] font-bold">גלול</span>
             </div>
           </div>
         </section>
 
-        {/* ===== MARQUEE ===== */}
-        <div dir="rtl" className="zone-ink border-y border-white/10 py-4 sm:py-5 text-lg sm:text-2xl font-black text-[var(--teal-soft)]">
+        {/* ===== MARQUEE — night strip ===== */}
+        <div dir="rtl" className="zone-night py-4 sm:py-5 text-lg sm:text-2xl font-black">
           <Marquee items={["AI מסמן, בעלים מחליט", "9 סוכנים שעובדים בשבילך", "דוחות בוואטסאפ", "עברית מלאה", "24/7", "בלי הוצאות שכר"]} />
         </div>
 
-        {/* ===== VIDEO — full teal ===== */}
-        <section id="video" dir="rtl" className="zone-teal relative py-16 sm:py-24 px-4 sm:px-6 lg:px-12">
+        {/* ===== VIDEO ===== */}
+        <section id="video" dir="rtl" className="relative py-16 sm:py-24 px-4 sm:px-6 lg:px-12">
           <div className="max-w-[1060px] mx-auto relative">
+            <div className="flex items-center justify-between mb-6">
+              <span className="idx" dir="ltr">002 — 006</span>
+              <Sticker className="!rotate-2">60 שניות</Sticker>
+            </div>
             <Reveal className="text-center mb-8 sm:mb-10">
-              <div className="mb-5"><Sticker>60 שניות</Sticker></div>
               <h2 className="text-[clamp(2rem,4.6vw,3.6rem)] font-black leading-[1.07] tracking-[-0.03em] mb-3">
-                ראה את הסוכנים <span className="hl">בפעולה</span>
+                ראה את הסוכנים <span className="grad-text">בפעולה</span>
               </h2>
-              <p className="text-base sm:text-lg text-soft max-w-xl mx-auto">
+              <p className="text-base sm:text-lg text-[var(--ink-2)] max-w-xl mx-auto">
                 60 שניות שמסבירות הכל. מה הם עושים, איך הם עובדים, ואיך זה משנה את היום שלך.
               </p>
             </Reveal>
@@ -1025,41 +1168,30 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ===== PRODUCT — paper proof zone ===== */}
-        <section id="product" dir="rtl" className="zone-paper relative overflow-hidden">
-          <div className="pt-16 sm:pt-20 text-center px-4">
-            <div className="eyebrow mb-5"><span>המוצר</span></div>
-          </div>
-          <ContainerScroll
-            titleComponent={
-              <div className="px-4 pb-6">
-                <h2 className="text-3xl sm:text-4xl lg:text-6xl font-black leading-[1.08] tracking-[-0.035em] text-[#0a1411] mb-4">
-                  כל הסוכנים שלך, <span className="hl">במסך אחד</span>
-                </h2>
-                <p className="text-base sm:text-lg text-soft leading-relaxed max-w-2xl mx-auto">
-                  רואים מה כל סוכן עשה, מתי, ומריצים בלחיצה. שליטה מלאה על העסק - בלי שום דבר טכני.
-                </p>
-              </div>
-            }
-          >
-            <div className="relative h-full w-full bg-white">
-              <Image
-                src="/shots/agents.png"
-                alt="דשבורד הסוכנים של Spike - כל הסוכנים, סטטוסים והרצה ידנית במסך אחד"
-                fill
-                unoptimized
-                sizes="(max-width: 768px) 100vw, 1024px"
-                className="object-cover object-top"
-              />
+        {/* ===== PRODUCT — scroll-driven 3D canvas ===== */}
+        <section id="product" dir="rtl" className="relative pt-10 sm:pt-14">
+          <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-12">
+            <div className="flex items-center justify-between mb-6">
+              <span className="idx" dir="ltr">003 — 006</span>
             </div>
-          </ContainerScroll>
+            <Reveal className="text-center mb-2">
+              <h2 className="text-[clamp(2rem,5vw,3.8rem)] font-black leading-[1.07] tracking-[-0.03em] mb-4">
+                כל הסוכנים שלך, <span className="grad-text">במסך אחד</span>
+              </h2>
+              <p className="text-base sm:text-lg lg:text-xl text-[var(--ink-2)] leading-relaxed max-w-2xl mx-auto">
+                רואים מה כל סוכן עשה, מתי, ומריצים בלחיצה. שליטה מלאה על העסק - בלי שום דבר טכני.
+              </p>
+            </Reveal>
+          </div>
 
-          <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-12 pb-16 sm:pb-24 grid lg:grid-cols-2 gap-12 lg:gap-14 items-start">
+          <CanvasScroll reduceMotion={!!reduceMotion} />
+
+          <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-12 pb-16 sm:pb-24 pt-6 grid lg:grid-cols-2 gap-12 lg:gap-14 items-start">
             <Reveal>
               <h3 className="text-2xl sm:text-3xl font-black leading-tight mb-3">
                 תראה את הקסם <span className="hl">בזמן אמת</span>
               </h3>
-              <p className="text-base text-soft leading-relaxed mb-6 max-w-xl">
+              <p className="text-base text-[var(--ink-2)] leading-relaxed mb-6 max-w-xl">
                 הודעת וואטסאפ נכנסת מליד חם. הסוכן מסווג, מתעדף, ומכין טיוטת תגובה - תוך 15 שניות. אתה רק מאשר.
               </p>
               <Tilt max={3} scale={1.006} outerClassName="[perspective:1400px]">
@@ -1072,14 +1204,14 @@ export default function LandingPage() {
                   label="app.spikeai.co.il/dashboard/showcase"
                 />
               </Tilt>
-              <p className="mt-3 text-center text-xs text-black/40">להמחשה · נתוני דמו</p>
+              <p className="mt-3 text-center text-xs text-[var(--ink-3)]">להמחשה · נתוני דמו</p>
             </Reveal>
 
             <Reveal delay={0.1}>
               <h3 className="text-2xl sm:text-3xl font-black leading-tight mb-3">
                 יודע מה אוזל, <span className="hl">לפני שזה קורה</span>
               </h3>
-              <p className="text-base text-soft leading-relaxed mb-6 max-w-xl">
+              <p className="text-base text-[var(--ink-2)] leading-relaxed mb-6 max-w-xl">
                 הסוכן סורק את המלאי, חוזה ביקוש, ומסמן בדיוק מה צריך הזמנה - לפני שנגמר. דוגמה אמיתית מתוך המערכת.
               </p>
               <Tilt max={5} scale={1.012} outerClassName="[perspective:1100px]">
@@ -1094,15 +1226,17 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ===== HOW IT WORKS — ink ===== */}
-        <section id="how" dir="rtl" className="zone-ink relative py-16 sm:py-24 px-4 sm:px-6 lg:px-12">
+        {/* ===== HOW ===== */}
+        <section id="how" dir="rtl" className="relative py-16 sm:py-24 px-4 sm:px-6 lg:px-12">
           <div className="max-w-[1240px] mx-auto relative">
+            <div className="flex items-center justify-between mb-6">
+              <span className="idx" dir="ltr">004 — 006</span>
+            </div>
             <Reveal className="text-center mb-12 sm:mb-16">
-              <div className="eyebrow mb-5"><span>איך זה עובד</span></div>
               <h2 className="text-[clamp(2rem,5vw,3.8rem)] font-black leading-[1.07] tracking-[-0.03em] mb-5">
-                3 שלבים. <span className="hl">תוך 7 ימים.</span>
+                3 שלבים. <span className="grad-text">תוך 7 ימים.</span>
               </h2>
-              <p className="text-base sm:text-lg lg:text-xl text-[var(--text-2)] leading-relaxed max-w-2xl mx-auto">
+              <p className="text-base sm:text-lg lg:text-xl text-[var(--ink-2)] leading-relaxed max-w-2xl mx-auto">
                 מהקליק הראשון עד שהסוכן שלך כבר עובד - תוך שבוע. בלי בירוקרטיה, בלי בלאגן.
               </p>
             </Reveal>
@@ -1112,10 +1246,10 @@ export default function LandingPage() {
                 <svg className="w-full overflow-visible" height="2" viewBox="0 0 100 2" preserveAspectRatio="none">
                   <defs>
                     <linearGradient id="how-line" x1="100%" y1="0%" x2="0%" y2="0%">
-                      <stop offset="0%" stopColor="rgba(22,211,171,0)" />
-                      <stop offset="18%" stopColor="rgba(22,211,171,0.65)" />
-                      <stop offset="82%" stopColor="rgba(91,208,242,0.65)" />
-                      <stop offset="100%" stopColor="rgba(91,208,242,0)" />
+                      <stop offset="0%" stopColor="rgba(17,195,158,0)" />
+                      <stop offset="18%" stopColor="rgba(17,195,158,0.7)" />
+                      <stop offset="82%" stopColor="rgba(139,92,246,0.7)" />
+                      <stop offset="100%" stopColor="rgba(139,92,246,0)" />
                     </linearGradient>
                   </defs>
                   <motion.line
@@ -1134,17 +1268,19 @@ export default function LandingPage() {
                   { num: "02", title: "שיחה איתנו", desc: "אנחנו לומדים את העסק שלך - איזה סוכנים יביאו לך הכי הרבה ערך. תוך כמה ימים מקבלים הצעה מותאמת.", footer: "בלי לחץ של מכירה" },
                   { num: "03", title: "הסוכן מתחיל לעבוד", desc: "אישרת את ההצעה? תוך 7 ימים הסוכן שלך כבר חי, מנתח, ושולח לך דוחות לוואטסאפ כל בוקר.", footer: "תוך 7 ימים" },
                 ].map((step, i) => (
-                  <Reveal key={i} delay={i * 0.12} className="glass glass-hover rounded-3xl p-6 sm:p-8 lg:p-10 relative overflow-hidden">
+                  <Reveal key={i} delay={i * 0.12} className="card-lite card-lite-hover rounded-3xl p-6 sm:p-8 lg:p-10 relative overflow-hidden">
                     <div className="num-ghost font-grotesk absolute -top-4 left-3 text-[6.5rem] lg:text-[8.5rem] select-none" aria-hidden>{step.num}</div>
                     <div className="relative z-10">
-                      <div className="font-grotesk w-16 h-16 rounded-2xl flex items-center justify-center mb-6 mx-auto lg:mx-0 text-2xl font-bold"
-                        style={{ background: "linear-gradient(135deg, var(--teal), var(--teal-2))", color: "var(--ink)" }}>
+                      <div
+                        className="font-grotesk w-16 h-16 rounded-2xl flex items-center justify-center mb-6 mx-auto lg:mx-0 text-2xl font-bold text-white"
+                        style={{ background: "var(--grad)" }}
+                      >
                         {step.num}
                       </div>
                       <h3 className="text-xl sm:text-2xl font-bold mb-2.5 text-center lg:text-right">{step.title}</h3>
-                      <p className="text-sm sm:text-base text-[var(--text-2)] leading-relaxed text-center lg:text-right mb-4">{step.desc}</p>
-                      <div className="flex items-center gap-2 text-xs sm:text-sm text-white/70 justify-center lg:justify-start">
-                        <Check className="text-[var(--teal-soft)]" />
+                      <p className="text-sm sm:text-base text-[var(--ink-2)] leading-relaxed text-center lg:text-right mb-4">{step.desc}</p>
+                      <div className="flex items-center gap-2 text-xs sm:text-sm text-[var(--ink-2)] justify-center lg:justify-start">
+                        <Check className="text-[var(--teal-deep)]" />
                         <span>{step.footer}</span>
                       </div>
                     </div>
@@ -1155,15 +1291,17 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ===== AGENTS — bento grid ===== */}
-        <section id="agents" dir="rtl" className="zone-ink relative py-16 sm:py-24 px-4 sm:px-6 lg:px-12">
+        {/* ===== AGENTS — bento ===== */}
+        <section id="agents" dir="rtl" className="relative py-16 sm:py-24 px-4 sm:px-6 lg:px-12">
           <div className="max-w-[1240px] mx-auto relative">
+            <div className="flex items-center justify-between mb-6">
+              <span className="idx" dir="ltr">005 — 006</span>
+            </div>
             <Reveal className="text-center mb-12 sm:mb-16">
-              <div className="eyebrow mb-5"><span>הצוות שלך</span></div>
               <h2 className="text-[clamp(2rem,5vw,3.8rem)] font-black leading-[1.07] tracking-[-0.03em] mb-5">
-                הצוות <span className="hl">שעובד בשבילך</span>
+                הצוות <span className="grad-text">שעובד בשבילך</span>
               </h2>
-              <p className="text-base sm:text-lg lg:text-xl text-[var(--text-2)] leading-relaxed max-w-2xl mx-auto">
+              <p className="text-base sm:text-lg lg:text-xl text-[var(--ink-2)] leading-relaxed max-w-2xl mx-auto">
                 כל סוכן הוא מומחה בתחום שלו. ביחד הם מטפלים בכל הצדדים של העסק - מהבוקר ועד הלילה.
               </p>
             </Reveal>
@@ -1185,23 +1323,23 @@ export default function LandingPage() {
                         max={8}
                         scale={1.02}
                         outerClassName="h-full [perspective:900px]"
-                        className="card-live spotlight-card glass rounded-3xl p-6 sm:p-8 relative h-full"
+                        className="card-live spotlight-card card-lite rounded-3xl p-6 sm:p-8 relative h-full"
                       >
                         <div className="relative z-10">
                           <div
-                            className="w-14 h-14 rounded-2xl flex items-center justify-center mb-5"
-                            style={{ background: "linear-gradient(135deg, var(--teal), var(--teal-2))", color: "var(--ink)" }}
+                            className="w-14 h-14 rounded-2xl flex items-center justify-center mb-5 text-white"
+                            style={{ background: ribbonGrads[index % ribbonGrads.length] }}
                           >
                             <AgentGlyph name={agent.iconKey} />
                           </div>
                           <h3 className={`${featured ? "text-2xl sm:text-3xl" : "text-lg sm:text-xl"} font-bold mb-2.5 text-right`}>{agent.name}</h3>
-                          <p className="text-[var(--text-2)] leading-relaxed text-right text-sm max-w-xl">{agent.description}</p>
+                          <p className="text-[var(--ink-2)] leading-relaxed text-right text-sm max-w-xl">{agent.description}</p>
                           {featured && (
                             <div className="mt-6 space-y-2.5 max-w-md" aria-hidden>
-                              <div className="rounded-2xl rounded-tr-sm bg-white/[0.07] border border-white/10 px-4 py-2.5 text-sm text-white/90 w-fit">
+                              <div className="rounded-2xl rounded-tr-sm bg-[rgba(11,20,17,0.05)] border border-[var(--line)] px-4 py-2.5 text-sm text-[var(--ink)] w-fit">
                                 בוקר טוב! 3 לידים חדשים מחכים לך 🔥
                               </div>
-                              <div className="rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm font-semibold w-fit mr-auto" style={{ background: "var(--teal)", color: "var(--ink)" }}>
+                              <div className="rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm font-semibold w-fit mr-auto text-white" style={{ background: ribbonGrads[0] }}>
                                 תודה ספייק, מתחיל מהחם ביותר
                               </div>
                             </div>
@@ -1216,87 +1354,76 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ===== STATEMENT — full teal, the Iron Rule ===== */}
-        <section id="approvals" dir="rtl" className="zone-teal relative py-16 sm:py-28 px-4 sm:px-6 lg:px-12 overflow-hidden">
-          <div className="max-w-[1060px] mx-auto text-center relative">
+        {/* ===== STATEMENT + CTA — gradient panel ===== */}
+        <section id="approvals" dir="rtl" className="relative py-10 sm:py-16 px-4 sm:px-6 lg:px-12">
+          <div className="max-w-[1240px] mx-auto">
             <Reveal>
-              <div className="mb-6"><Sticker>ככה זה נראה במערכת</Sticker></div>
-              <h2 className="text-[clamp(2.6rem,7vw,5.4rem)] font-black leading-[1.02] tracking-[-0.035em] mb-5">
-                AI מסמן. <span className="hl">אתה מחליט.</span>
-              </h2>
-              <p className="text-base sm:text-xl text-soft leading-relaxed max-w-2xl mx-auto mb-10">
-                כל פעולה היא טיוטה שמחכה לך. מאשר בלחיצה - ואז נשלח. אף פעם לא אוטומטית, אף פעם לא בלי האישור שלך.
-              </p>
-            </Reveal>
-            <Reveal delay={0.1} className="-rotate-1">
-              <Tilt max={3} scale={1.006} outerClassName="[perspective:1400px]">
-                <BrowserFrame
-                  tone="light"
-                  src="/shots/approvals.png"
-                  alt="טיוטות פוסטים שהסוכן הכין, ממתינות לאישור או דחייה של בעל העסק"
-                  width={1571}
-                  height={1270}
-                  label="app.spikeai.co.il/dashboard/approvals"
-                />
-              </Tilt>
+              <div className="grad-panel rounded-[2rem] sm:rounded-[2.75rem] px-5 sm:px-10 lg:px-16 py-12 sm:py-16 text-center">
+                <div className="relative z-10">
+                  <div className="mb-6"><Sticker className="!rotate-2">ככה זה נראה במערכת</Sticker></div>
+                  <h2 className="text-[clamp(2.4rem,6.4vw,5rem)] font-black leading-[1.03] tracking-[-0.035em] mb-5 text-white">
+                    AI מסמן.{" "}
+                    <span className="bg-white text-[var(--ink)] px-[0.28em] rounded-[0.18em] box-decoration-clone">אתה מחליט.</span>
+                  </h2>
+                  <p className="text-base sm:text-xl text-white/90 leading-relaxed max-w-2xl mx-auto mb-10">
+                    כל פעולה היא טיוטה שמחכה לך. מאשר בלחיצה - ואז נשלח. אף פעם לא אוטומטית, אף פעם לא בלי האישור שלך.
+                  </p>
+                  <div className="-rotate-1 max-w-[900px] mx-auto mb-10">
+                    <Tilt max={3} scale={1.006} outerClassName="[perspective:1400px]">
+                      <BrowserFrame
+                        tone="light"
+                        src="/shots/approvals.png"
+                        alt="טיוטות פוסטים שהסוכן הכין, ממתינות לאישור או דחייה של בעל העסק"
+                        width={1571}
+                        height={1270}
+                        label="app.spikeai.co.il/dashboard/approvals"
+                      />
+                    </Tilt>
+                  </div>
+                  <Magnetic strength={0.25} className="inline-block">
+                  <LiquidButton
+                    size="xl"
+                    className="text-white border border-white/40 rounded-full text-base font-bold"
+                    onClick={() => {
+                      if (typeof document !== "undefined") {
+                        document.getElementById("cta")?.scrollIntoView({ behavior: "smooth" });
+                      }
+                    }}
+                  >
+                    קבל הצעה אישית
+                  </LiquidButton>
+                  </Magnetic>
+                  <p className="text-sm text-white/80 mt-4">נחזור אליך תוך 24 שעות. בלי התחייבות, בלי לחץ.</p>
+                </div>
+              </div>
             </Reveal>
           </div>
         </section>
 
-        {/* ===== COLORFUL: SHADER CTA ===== */}
-        <section className="relative min-h-[78vh] flex items-center justify-center overflow-hidden bg-black">
-          <div className="absolute inset-0 z-0">
-            <WebGLShader />
-          </div>
-          <div className="absolute inset-0 z-[1] pointer-events-none bg-gradient-to-b from-transparent via-black/25 to-[#04100d]" />
-
-          <div dir="rtl" className="relative z-10 text-center px-4 sm:px-6 py-24 max-w-3xl mx-auto">
-            <div className="eyebrow mb-6 border-white/25 bg-white/10 text-white/90"><span>קבל הצעה</span></div>
-            <h2 className="text-4xl sm:text-5xl lg:text-7xl font-black leading-[1.04] tracking-[-0.04em] text-white mb-5">
-              מוכן להתחיל?{" "}
-              <span className="block">בוא נדבר.</span>
-            </h2>
-            <p className="text-base sm:text-lg lg:text-xl text-white/80 leading-relaxed max-w-2xl mx-auto mb-9">
-              השאר פרטים ונחזור אליך תוך 24 שעות עם הצעה אישית מותאמת לעסק שלך. בלי התחייבות, בלי לחץ.
-            </p>
-            <Magnetic strength={0.25} className="inline-block">
-            <LiquidButton
-              size="xl"
-              className="text-white border border-white/30 rounded-full text-base font-bold"
-              onClick={() => {
-                if (typeof document !== "undefined") {
-                  document.getElementById("cta")?.scrollIntoView({ behavior: "smooth" });
-                }
-              }}
-            >
-              קבל הצעה אישית
-            </LiquidButton>
-            </Magnetic>
-          </div>
-        </section>
-
-        {/* ===== PACKAGE — paper ticket on ink ===== */}
-        <section id="pricing" dir="rtl" className="zone-ink relative py-16 sm:py-28 px-4 sm:px-6 lg:px-12">
+        {/* ===== PACKAGE ===== */}
+        <section id="pricing" dir="rtl" className="relative py-16 sm:py-24 px-4 sm:px-6 lg:px-12">
           <div className="max-w-[1240px] mx-auto relative">
+            <div className="flex items-center justify-between mb-6">
+              <span className="idx" dir="ltr">006 — 006</span>
+            </div>
             <Reveal className="text-center mb-12 sm:mb-16">
-              <div className="eyebrow mb-5"><span>החבילה</span></div>
               <h2 className="text-[clamp(2rem,5vw,3.8rem)] font-black leading-[1.07] tracking-[-0.03em] mb-5">
-                חבילה אחת. <span className="hl">הכל כלול.</span>
+                חבילה אחת. <span className="grad-text">הכל כלול.</span>
               </h2>
-              <p className="text-base sm:text-lg lg:text-xl text-[var(--text-2)] leading-relaxed max-w-2xl mx-auto">
+              <p className="text-base sm:text-lg lg:text-xl text-[var(--ink-2)] leading-relaxed max-w-2xl mx-auto">
                 בלי שדרוגים. בלי תוספות. בלי הפתעות בחשבון. כל הסוכנים, כל החיבורים, וכל ההתאמות - בחבילה אחת מותאמת לעסק שלך.
               </p>
             </Reveal>
 
             <Reveal delay={0.1}>
-              <div className="card-paper rounded-[2rem] overflow-hidden max-w-[1100px] mx-auto">
+              <div className="card-lite rounded-[2rem] overflow-hidden max-w-[1100px] mx-auto">
                 <div
                   className="flex flex-wrap items-center justify-between gap-4 px-6 sm:px-10 py-6 sm:py-7"
-                  style={{ background: "linear-gradient(135deg, var(--teal-surface), var(--teal-surface-2))" }}
+                  style={{ background: "var(--grad)" }}
                 >
                   <div className="text-right">
-                    <h3 className="text-2xl sm:text-4xl font-black text-[#04100d]">החבילה המלאה</h3>
-                    <p className="text-sm sm:text-base text-[#04100d]/75 mt-1 max-w-xl">
+                    <h3 className="text-2xl sm:text-4xl font-black text-white">החבילה המלאה</h3>
+                    <p className="text-sm sm:text-base text-white/85 mt-1 max-w-xl">
                       הצעה מותאמת אישית לעסק שלך. בשיחה איתנו נבין את הצרכים שלך ונבנה את החבילה הנכונה.
                     </p>
                   </div>
@@ -1305,48 +1432,48 @@ export default function LandingPage() {
 
                 <div className="p-5 sm:p-8 lg:p-10">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 mb-8 sm:mb-10 items-stretch">
-                    <div className="rounded-2xl border border-black/10 bg-black/[0.025] p-5 sm:p-6 order-2 md:order-1">
-                      <div className="flex items-center gap-3 mb-4 pb-3.5 border-b border-black/10">
+                    <div className="rounded-2xl border border-[var(--line)] bg-[rgba(11,20,17,0.02)] p-5 sm:p-6 order-2 md:order-1">
+                      <div className="flex items-center gap-3 mb-4 pb-3.5 border-b border-[var(--line)]">
                         <h4 className="text-base sm:text-lg font-bold">מתחבר ל-</h4>
                       </div>
                       <ul className="space-y-2.5 sm:space-y-3">
                         {packageIncludes.connections.map((item, i) => (
-                          <li key={i} className="flex items-start gap-2.5 text-sm text-[#0a1411]/85">
-                            <Check className="text-[#0c7a63] mt-0.5 flex-shrink-0" />
+                          <li key={i} className="flex items-start gap-2.5 text-sm text-[var(--ink-2)]">
+                            <Check className="text-[var(--teal-deep)] mt-0.5 flex-shrink-0" />
                             <span>{item}</span>
                           </li>
                         ))}
                       </ul>
                     </div>
 
-                    <div className="rounded-2xl border-2 border-[var(--teal)] bg-white p-5 sm:p-6 lg:p-7 order-1 md:order-2 relative md:scale-[1.04] shadow-[0_20px_50px_rgba(16,184,148,0.25)]">
+                    <div className="rounded-2xl border-2 border-[var(--teal)] bg-white p-5 sm:p-6 lg:p-7 order-1 md:order-2 relative md:scale-[1.04] shadow-[0_24px_50px_-18px_rgba(17,195,158,0.45)]">
                       <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
                         <Sticker className="sticker-teal !rotate-0 whitespace-nowrap">הלב של החבילה</Sticker>
                       </div>
-                      <div className="flex items-center gap-3 mb-4 pb-3.5 border-b border-black/10 mt-3">
+                      <div className="flex items-center gap-3 mb-4 pb-3.5 border-b border-[var(--line)] mt-3">
                         <div>
                           <h4 className="text-lg sm:text-xl font-black">הסוכנים</h4>
-                          <p className="text-xs text-[#0a1411]/55">הצוות שעובד בשבילך 24/7</p>
+                          <p className="text-xs text-[var(--ink-3)]">הצוות שעובד בשבילך 24/7</p>
                         </div>
                       </div>
                       <ul className="space-y-2.5 sm:space-y-3">
                         {packageIncludes.agents.map((item, i) => (
-                          <li key={i} className="flex items-start gap-2.5 text-sm text-[#0a1411]">
-                            <Check className="text-[#0c7a63] mt-0.5 flex-shrink-0" />
+                          <li key={i} className="flex items-start gap-2.5 text-sm text-[var(--ink)]">
+                            <Check className="text-[var(--teal-deep)] mt-0.5 flex-shrink-0" />
                             <span>{item}</span>
                           </li>
                         ))}
                       </ul>
                     </div>
 
-                    <div className="rounded-2xl border border-black/10 bg-black/[0.025] p-5 sm:p-6 order-3">
-                      <div className="flex items-center gap-3 mb-4 pb-3.5 border-b border-black/10">
+                    <div className="rounded-2xl border border-[var(--line)] bg-[rgba(11,20,17,0.02)] p-5 sm:p-6 order-3">
+                      <div className="flex items-center gap-3 mb-4 pb-3.5 border-b border-[var(--line)]">
                         <h4 className="text-base sm:text-lg font-bold">השירות</h4>
                       </div>
                       <ul className="space-y-2.5 sm:space-y-3">
                         {packageIncludes.service.map((item, i) => (
-                          <li key={i} className="flex items-start gap-2.5 text-sm text-[#0a1411]/85">
-                            <Check className="text-[#0c7a63] mt-0.5 flex-shrink-0" />
+                          <li key={i} className="flex items-start gap-2.5 text-sm text-[var(--ink-2)]">
+                            <Check className="text-[var(--teal-deep)] mt-0.5 flex-shrink-0" />
                             <span>{item}</span>
                           </li>
                         ))}
@@ -1360,7 +1487,7 @@ export default function LandingPage() {
                       קבל הצעה אישית
                     </a>
                     </Magnetic>
-                    <p className="text-xs sm:text-sm text-[#0a1411]/55 mt-3 sm:mt-4">בלי התחייבות. בלי לחץ של מכירה.</p>
+                    <p className="text-xs sm:text-sm text-[var(--ink-3)] mt-3 sm:mt-4">בלי התחייבות. בלי לחץ של מכירה.</p>
                   </div>
                 </div>
               </div>
@@ -1369,36 +1496,36 @@ export default function LandingPage() {
         </section>
 
         {/* ===== DETAILED FORM ===== */}
-        <section id="cta" dir="rtl" className="zone-ink relative py-16 sm:py-24 px-4 sm:px-6 lg:px-12">
+        <section id="cta" dir="rtl" className="relative py-16 sm:py-24 px-4 sm:px-6 lg:px-12">
           <div className="max-w-[800px] mx-auto relative">
             <Reveal className="text-center mb-8 sm:mb-12">
               <div className="eyebrow mb-5"><span>קבל הצעה</span></div>
               <h2 className="text-[clamp(2rem,5vw,3.8rem)] font-black leading-[1.07] tracking-[-0.03em] mb-5">
-                מוכן להתחיל? <span className="hl">בוא נדבר.</span>
+                מוכן להתחיל? <span className="grad-text">בוא נדבר.</span>
               </h2>
-              <p className="text-base sm:text-lg lg:text-xl text-[var(--text-2)] leading-relaxed max-w-2xl mx-auto">
+              <p className="text-base sm:text-lg lg:text-xl text-[var(--ink-2)] leading-relaxed max-w-2xl mx-auto">
                 השאר פרטים ונחזור אליך תוך 24 שעות עם הצעה אישית מותאמת לעסק שלך. בלי התחייבות, בלי לחץ.
               </p>
             </Reveal>
 
-            <Reveal delay={0.05} className="card-live glass rounded-[2rem] p-5 sm:p-8 lg:p-12 relative">
+            <Reveal delay={0.05} className="card-live card-lite rounded-[2rem] p-5 sm:p-8 lg:p-12 relative">
               <div className="relative z-10">
                 {!isSubmitted ? (
                   <form onSubmit={handleSubmit} className="space-y-5">
                     <div>
-                      <label htmlFor="name" className="block text-sm font-semibold mb-2 text-right text-white/90">שם מלא</label>
+                      <label htmlFor="name" className="block text-sm font-semibold mb-2 text-right text-[var(--ink)]">שם מלא</label>
                       <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} placeholder="ישראל ישראלי" required className="field px-5 py-4" />
                     </div>
                     <div>
-                      <label htmlFor="phone" className="block text-sm font-semibold mb-2 text-right text-white/90">טלפון</label>
+                      <label htmlFor="phone" className="block text-sm font-semibold mb-2 text-right text-[var(--ink)]">טלפון</label>
                       <input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleChange} placeholder="050-1234567" required className="field px-5 py-4" />
                     </div>
                     <div>
-                      <label htmlFor="email" className="block text-sm font-semibold mb-2 text-right text-white/90">אימייל</label>
+                      <label htmlFor="email" className="block text-sm font-semibold mb-2 text-right text-[var(--ink)]">אימייל</label>
                       <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} placeholder="israel@example.com" required className="field px-5 py-4" />
                     </div>
                     <div>
-                      <label htmlFor="businessType" className="block text-sm font-semibold mb-2 text-right text-white/90">תחום העסק</label>
+                      <label htmlFor="businessType" className="block text-sm font-semibold mb-2 text-right text-[var(--ink)]">תחום העסק</label>
                       <select id="businessType" name="businessType" value={formData.businessType} onChange={handleChange} required className="field field-select px-5 py-4">
                         <option value="">בחר תחום</option>
                         <option value="service">💼 עסק שירות (קליניקה, מספרה, מאמן)</option>
@@ -1431,12 +1558,12 @@ export default function LandingPage() {
                           aria-label="אישור מדיניות הפרטיות ותנאי השימוש (חובה)"
                           className="consent-box"
                         />
-                        <span className="text-[13px] leading-relaxed text-white/70 flex-1">
-                          <span className="text-white/90 font-semibold text-[11px] ml-1">חובה</span>
+                        <span className="text-[13px] leading-relaxed text-[var(--ink-2)] flex-1">
+                          <span className="text-[var(--ink)] font-semibold text-[11px] ml-1">חובה</span>
                           קראתי את{" "}
-                          <Link href="/privacy" target="_blank" rel="noopener" className="text-white underline underline-offset-2 hover:text-white/80">מדיניות הפרטיות</Link>
+                          <Link href="/privacy" target="_blank" rel="noopener" className="text-[var(--ink)] underline underline-offset-2 hover:opacity-70">מדיניות הפרטיות</Link>
                           {" "}ואת{" "}
-                          <Link href="/terms" target="_blank" rel="noopener" className="text-white underline underline-offset-2 hover:text-white/80">תנאי השימוש</Link>
+                          <Link href="/terms" target="_blank" rel="noopener" className="text-[var(--ink)] underline underline-offset-2 hover:opacity-70">תנאי השימוש</Link>
                           {" "}ואני מסכים/ה להם.
                         </span>
                       </label>
@@ -1449,29 +1576,29 @@ export default function LandingPage() {
                           aria-label="אישור קבלת חומר שיווקי (אופציונלי)"
                           className="consent-box"
                         />
-                        <span className="text-[13px] leading-relaxed text-white/70 flex-1">
-                          <span className="text-white/40 font-medium text-[11px] ml-1">אופציונלי</span>
+                        <span className="text-[13px] leading-relaxed text-[var(--ink-2)] flex-1">
+                          <span className="text-[var(--ink-3)] font-medium text-[11px] ml-1">אופציונלי</span>
                           אני מאשר/ת לקבל חומר שיווקי, עדכונים והצעות בדוא&quot;ל ובהודעות.
                         </span>
                       </label>
                     </div>
 
                     {submitError && (
-                      <div className="rounded-xl border border-white/25 bg-white/5 px-4 py-3 text-sm text-white/90 text-center">{submitError}</div>
+                      <div className="rounded-xl border border-[var(--line-hi)] bg-[rgba(11,20,17,0.04)] px-4 py-3 text-sm text-[var(--ink)] text-center">{submitError}</div>
                     )}
 
                     <button type="submit" disabled={isSubmitting || !agreedToTerms} className="w-full btn-primary px-8 py-5 text-lg">
                       {isSubmitting ? "שולח..." : "שלח ובוא נדבר"}
                     </button>
 
-                    <p className="text-xs text-white/45 text-center mt-4">הפרטים שלך מוגנים. אנחנו לא משתפים אותם עם אף אחד.</p>
+                    <p className="text-xs text-[var(--ink-3)] text-center mt-4">הפרטים שלך מוגנים. אנחנו לא משתפים אותם עם אף אחד.</p>
                   </form>
                 ) : (
                   <div className="text-center py-8">
                     <h3 className="text-3xl lg:text-4xl font-black mb-4">תודה <span className="hl">{formData.name}!</span></h3>
-                    <p className="text-lg text-white/85 mb-2">קיבלנו את הפרטים שלך.</p>
-                    <p className="text-base text-[var(--text-2)] mb-8">נחזור אליך תוך 24 שעות עם הצעה אישית מותאמת לעסק שלך.</p>
-                    <div className="inline-flex items-center gap-2 border border-white/15 bg-white/5 rounded-full px-4 py-2 text-sm text-white/80">
+                    <p className="text-lg text-[var(--ink)] mb-2">קיבלנו את הפרטים שלך.</p>
+                    <p className="text-base text-[var(--ink-2)] mb-8">נחזור אליך תוך 24 שעות עם הצעה אישית מותאמת לעסק שלך.</p>
+                    <div className="inline-flex items-center gap-2 border border-[var(--line)] bg-[rgba(11,20,17,0.03)] rounded-full px-4 py-2 text-sm text-[var(--ink-2)]">
                       <span>תקבל אישור באימייל</span>
                     </div>
                   </div>
@@ -1479,23 +1606,23 @@ export default function LandingPage() {
               </div>
             </Reveal>
 
-            <div className="mt-10 flex flex-wrap justify-center gap-x-8 gap-y-4 text-sm text-white/55">
-              <span className="flex items-center gap-2"><Check className="text-[var(--teal-soft)]" /><span>תגובה תוך 24 שעות</span></span>
-              <span className="flex items-center gap-2"><Check className="text-[var(--teal-soft)]" /><span>בלי התחייבות</span></span>
-              <span className="flex items-center gap-2"><Check className="text-[var(--teal-soft)]" /><span>שירות בעברית</span></span>
+            <div className="mt-10 flex flex-wrap justify-center gap-x-8 gap-y-4 text-sm text-[var(--ink-2)]">
+              <span className="flex items-center gap-2"><Check className="text-[var(--teal-deep)]" /><span>תגובה תוך 24 שעות</span></span>
+              <span className="flex items-center gap-2"><Check className="text-[var(--teal-deep)]" /><span>בלי התחייבות</span></span>
+              <span className="flex items-center gap-2"><Check className="text-[var(--teal-deep)]" /><span>שירות בעברית</span></span>
             </div>
           </div>
         </section>
 
         {/* ===== FAQ ===== */}
-        <section id="faq" dir="rtl" className="zone-ink relative py-16 sm:py-24 px-4 sm:px-6 lg:px-12">
+        <section id="faq" dir="rtl" className="relative py-16 sm:py-24 px-4 sm:px-6 lg:px-12">
           <div className="max-w-[900px] mx-auto relative">
             <Reveal className="text-center mb-12 sm:mb-16">
               <div className="eyebrow mb-5"><span>שאלות נפוצות</span></div>
               <h2 className="text-[clamp(2rem,5vw,3.8rem)] font-black leading-[1.07] tracking-[-0.03em] mb-5">
-                יש לך שאלות? <span className="hl">יש לנו תשובות.</span>
+                יש לך שאלות? <span className="grad-text">יש לנו תשובות.</span>
               </h2>
-              <p className="text-base sm:text-lg lg:text-xl text-[var(--text-2)] leading-relaxed max-w-2xl mx-auto">
+              <p className="text-base sm:text-lg lg:text-xl text-[var(--ink-2)] leading-relaxed max-w-2xl mx-auto">
                 התשובות לשאלות הנפוצות שאנחנו מקבלים. אם משהו לא ברור - תמיד אפשר לפנות אלינו.
               </p>
             </Reveal>
@@ -1504,18 +1631,18 @@ export default function LandingPage() {
               {faqs.map((faq, index) => {
                 const open = openFaq === index;
                 return (
-                  <div key={index} className={`glass rounded-2xl overflow-hidden ${open ? "border-white/25 bg-white/[0.06]" : ""}`}>
+                  <div key={index} className={`card-lite rounded-2xl overflow-hidden ${open ? "border-[var(--line-hi)] shadow-lg" : ""}`}>
                     <button
                       className="w-full px-5 sm:px-7 py-4 sm:py-6 text-right flex items-center gap-4 cursor-pointer"
                       onClick={() => toggleFaq(index)}
                       aria-expanded={open}
                     >
-                      <span className="font-grotesk text-sm text-[var(--teal-soft)]/70 w-7 flex-shrink-0" aria-hidden>
+                      <span className="font-grotesk text-sm text-[var(--teal-deep)]/80 w-7 flex-shrink-0" aria-hidden>
                         {String(index + 1).padStart(2, "0")}
                       </span>
                       <span className="text-sm sm:text-base lg:text-lg font-bold text-right flex-1">{faq.question}</span>
                       <span
-                        className={`flex-shrink-0 w-8 h-8 rounded-full border border-white/20 bg-white/5 flex items-center justify-center text-lg font-light text-white transition-transform duration-300 ${open ? "rotate-45" : ""}`}
+                        className={`flex-shrink-0 w-8 h-8 rounded-full border border-[var(--line)] bg-[rgba(11,20,17,0.03)] flex items-center justify-center text-lg font-light text-[var(--ink)] transition-transform duration-300 ${open ? "rotate-45" : ""}`}
                         aria-hidden
                       >
                         +
@@ -1531,7 +1658,7 @@ export default function LandingPage() {
                           transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
                           className="overflow-hidden"
                         >
-                          <div className="px-5 sm:px-7 pb-5 sm:pb-6 text-sm lg:text-base text-[var(--text-2)] leading-relaxed text-right">
+                          <div className="px-5 sm:px-7 pb-5 sm:pb-6 text-sm lg:text-base text-[var(--ink-2)] leading-relaxed text-right">
                             {faq.answer}
                           </div>
                         </motion.div>
@@ -1543,14 +1670,14 @@ export default function LandingPage() {
             </div>
 
             <div className="text-center mt-10 sm:mt-12">
-              <p className="text-sm sm:text-base text-white/55 mb-3 sm:mb-4">יש לך שאלה אחרת?</p>
+              <p className="text-sm sm:text-base text-[var(--ink-2)] mb-3 sm:mb-4">יש לך שאלה אחרת?</p>
               <a href="#cta" className="inline-flex btn-ghost px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base">בוא נדבר ←</a>
             </div>
           </div>
         </section>
 
-        {/* ===== FOOTER ===== */}
-        <footer dir="rtl" className="zone-ink relative border-t border-white/10 mt-8 overflow-hidden">
+        {/* ===== FOOTER — night ===== */}
+        <footer dir="rtl" className="zone-night relative mt-8 overflow-hidden">
           <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-12 py-10 sm:py-14 relative">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 md:gap-8 mb-8 sm:mb-10">
               <div className="text-center md:text-right">
@@ -1559,8 +1686,8 @@ export default function LandingPage() {
                     <Image src="/spike-mascot.png" alt="Spike AI" fill sizes="40px" className="object-contain mascot-mono" />
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="font-grotesk text-xl font-bold tracking-tight">Spike AI</span>
-                    <span className="font-grotesk text-[10px] font-medium tracking-[0.25em] text-[var(--teal-soft)] border border-[rgba(22,211,171,0.35)] px-2 py-0.5 rounded-full">
+                    <span className="font-grotesk text-xl font-bold tracking-tight text-white">Spike AI</span>
+                    <span className="font-grotesk text-[10px] font-medium tracking-[0.25em] text-[#9beedd] border border-[rgba(17,195,158,0.4)] px-2 py-0.5 rounded-full">
                       AGENTS
                     </span>
                   </div>
@@ -1599,11 +1726,11 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div aria-hidden className="pointer-events-none select-none font-grotesk font-bold text-white/[0.045] text-[17vw] leading-[0.8] text-center -mb-[2vw]" dir="ltr">
+            <div aria-hidden className="pointer-events-none select-none font-grotesk font-bold text-white/[0.05] text-[17vw] leading-[0.8] text-center -mb-[2vw]" dir="ltr">
               SPIKE
             </div>
 
-            <div className="pt-8 border-t border-white/5 text-center space-y-2 relative">
+            <div className="pt-8 border-t border-white/10 text-center space-y-2 relative">
               <p className="text-xs text-white/35">כל התצוגות באתר להמחשה בלבד · הנתונים והשמות לדוגמה ואינם לקוחות אמיתיים.</p>
               <p className="text-xs text-white/40">© 2026 Spike AI Agents. כל הזכויות שמורות.</p>
             </div>
