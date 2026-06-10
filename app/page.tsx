@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion, useMotionValue, useReducedMotion, useScroll, useSpring } from "framer-motion";
 import { ContainerScroll } from "@/components/ui/container-scroll-animation";
 import { WebGLShader } from "@/components/ui/web-gl-shader";
 import { LiquidButton } from "@/components/ui/liquid-glass-button";
@@ -277,6 +277,183 @@ function Reveal({
   );
 }
 
+/* ===== Premium motion helpers (pointer-fine only, reduced-motion safe) ===== */
+function usePointerFine() {
+  const reduce = useReducedMotion();
+  const [fine, setFine] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const update = () => setFine(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+  return fine && !reduce;
+}
+
+/* Thin scroll progress bar — grows from the right (RTL) */
+function ScrollProgress() {
+  const reduce = useReducedMotion();
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { stiffness: 150, damping: 28, mass: 0.4 });
+  if (reduce) return null;
+  return (
+    <motion.div
+      aria-hidden
+      className="fixed top-0 inset-x-0 z-[70] h-[2.5px] origin-right pointer-events-none"
+      style={{
+        scaleX,
+        background: "linear-gradient(to left, #22D3B0, #5EEAD4 50%, #5BD0F2)",
+        boxShadow: "0 0 12px rgba(34,211,176,0.55)",
+      }}
+    />
+  );
+}
+
+/* Magnetic hover — the element leans gently toward the cursor */
+function Magnetic({
+  children,
+  className,
+  strength = 0.22,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  strength?: number;
+}) {
+  const fine = usePointerFine();
+  const ref = useRef<HTMLDivElement>(null);
+  const xRaw = useMotionValue(0);
+  const yRaw = useMotionValue(0);
+  const x = useSpring(xRaw, { stiffness: 220, damping: 16, mass: 0.5 });
+  const y = useSpring(yRaw, { stiffness: 220, damping: 16, mass: 0.5 });
+  if (!fine) return <div className={className}>{children}</div>;
+  return (
+    <motion.div
+      ref={ref}
+      className={className}
+      style={{ x, y }}
+      onPointerMove={(e) => {
+        const el = ref.current;
+        if (!el) return;
+        const r = el.getBoundingClientRect();
+        const lim = 12;
+        xRaw.set(Math.max(-lim, Math.min(lim, (e.clientX - (r.left + r.width / 2)) * strength)));
+        yRaw.set(Math.max(-lim, Math.min(lim, (e.clientY - (r.top + r.height / 2)) * strength)));
+      }}
+      onPointerLeave={() => {
+        xRaw.set(0);
+        yRaw.set(0);
+      }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/* 3D tilt — the card leans toward the cursor, with a tracked glare + border spotlight */
+function Tilt({
+  children,
+  className,
+  outerClassName = "[perspective:1000px]",
+  max = 6,
+  scale = 1.015,
+  glare = true,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  outerClassName?: string;
+  max?: number;
+  scale?: number;
+  glare?: boolean;
+}) {
+  const fine = usePointerFine();
+  const ref = useRef<HTMLDivElement>(null);
+  const rxRaw = useMotionValue(0);
+  const ryRaw = useMotionValue(0);
+  const sRaw = useMotionValue(1);
+  const rotateX = useSpring(rxRaw, { stiffness: 170, damping: 18, mass: 0.6 });
+  const rotateY = useSpring(ryRaw, { stiffness: 170, damping: 18, mass: 0.6 });
+  const tiltScale = useSpring(sRaw, { stiffness: 220, damping: 20, mass: 0.5 });
+  if (!fine) return <div className={className}>{children}</div>;
+  return (
+    <div className={outerClassName}>
+      <motion.div
+        ref={ref}
+        className={"group/tilt relative will-change-transform " + (className ?? "")}
+        style={{ rotateX, rotateY, scale: tiltScale, transformStyle: "preserve-3d" }}
+        onPointerMove={(e) => {
+          const el = ref.current;
+          if (!el) return;
+          const r = el.getBoundingClientRect();
+          const px = (e.clientX - r.left) / r.width;
+          const py = (e.clientY - r.top) / r.height;
+          rxRaw.set((0.5 - py) * 2 * max);
+          ryRaw.set((px - 0.5) * 2 * max);
+          el.style.setProperty("--mx", `${(px * 100).toFixed(1)}%`);
+          el.style.setProperty("--my", `${(py * 100).toFixed(1)}%`);
+        }}
+        onPointerEnter={() => sRaw.set(scale)}
+        onPointerLeave={() => {
+          rxRaw.set(0);
+          ryRaw.set(0);
+          sRaw.set(1);
+        }}
+      >
+        {children}
+        {glare && (
+          <div
+            aria-hidden
+            className="tilt-glare pointer-events-none absolute inset-0 rounded-[inherit] opacity-0 group-hover/tilt:opacity-100 transition-opacity duration-300"
+          />
+        )}
+      </motion.div>
+    </div>
+  );
+}
+
+/* Kinetic headline — words rise into place on load (copy stays verbatim) */
+function RiseWords({
+  text,
+  wordClass,
+  className,
+  delay = 0,
+}: {
+  text: string;
+  wordClass?: string;
+  className?: string;
+  delay?: number;
+}) {
+  const reduce = useReducedMotion();
+  const words = text.split(" ");
+  if (reduce) {
+    return (
+      <span className={className}>
+        {wordClass ? <span className={wordClass}>{text}</span> : text}
+      </span>
+    );
+  }
+  return (
+    <span className={className}>
+      <span className="sr-only">{text}</span>
+      <span aria-hidden>
+        {words.map((w, i) => (
+          <span key={i} className="inline-block overflow-hidden align-bottom pb-[0.12em] -mb-[0.12em]">
+            <motion.span
+              className={"inline-block " + (wordClass ?? "")}
+              initial={{ y: "115%" }}
+              animate={{ y: "0%" }}
+              transition={{ duration: 0.75, delay: delay + i * 0.07, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {w}
+            </motion.span>
+            {i < words.length - 1 ? "\u00A0" : null}
+          </span>
+        ))}
+      </span>
+    </span>
+  );
+}
+
 /* ===== Light-zone product mock: the Spike WhatsApp morning report ===== */
 /* ===== Product screenshot frame (real app screens exported as PNG) ===== */
 function BrowserFrame({
@@ -293,7 +470,7 @@ function BrowserFrame({
   label: string;
 }) {
   return (
-    <div className="relative rounded-2xl border border-white/12 bg-white/[0.03] overflow-hidden shadow-[0_30px_80px_rgba(0,0,0,0.5),0_0_60px_rgba(34,211,176,0.12)]">
+    <div className="group/frame relative rounded-2xl border border-white/12 bg-white/[0.03] overflow-hidden shadow-[0_30px_80px_rgba(0,0,0,0.5),0_0_60px_rgba(34,211,176,0.12)]">
       <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/10 bg-white/[0.03]">
         <span className="flex gap-1.5" aria-hidden>
           <span className="w-2.5 h-2.5 rounded-full bg-white/15" />
@@ -305,6 +482,14 @@ function BrowserFrame({
         </span>
       </div>
       <Image src={src} alt={alt} width={width} height={height} unoptimized className="block w-full h-auto" />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-0 group-hover/frame:opacity-100 transition-opacity duration-500"
+        style={{
+          background:
+            "linear-gradient(115deg, transparent 38%, rgba(255,255,255,0.05) 48%, rgba(94,234,212,0.09) 53%, transparent 66%)",
+        }}
+      />
     </div>
   );
 }
@@ -353,6 +538,15 @@ export default function LandingPage() {
 
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const reduceMotion = useReducedMotion();
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const handleHeroSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -546,8 +740,16 @@ export default function LandingPage() {
       `}</style>
 
       <div className="grain relative">
+        <ScrollProgress />
         {/* ===== NAV ===== */}
-        <nav dir="rtl" className="fixed top-0 inset-x-0 z-50 backdrop-blur-xl bg-[#08090A]/60 border-b border-white/[0.06]">
+        <nav
+          dir="rtl"
+          className={`fixed top-0 inset-x-0 z-50 backdrop-blur-xl border-b transition-[background-color,border-color,box-shadow] duration-300 ${
+            scrolled
+              ? "bg-[#08090A]/85 border-white/10 shadow-[0_10px_30px_-12px_rgba(0,0,0,0.7)]"
+              : "bg-[#08090A]/45 border-white/[0.05]"
+          }`}
+        >
           <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-12 py-3 sm:py-4 flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
               <div className="relative w-8 h-8 sm:w-10 sm:h-10">
@@ -617,6 +819,7 @@ export default function LandingPage() {
 
           {/* ===== HERO (dark, quiet) ===== */}
           <section className="relative pt-28 pb-12 sm:pt-32 sm:pb-20 lg:pt-36 lg:pb-28 px-4 sm:px-6 lg:px-12">
+            <div className="aurora" aria-hidden />
             <div className="max-w-[1280px] mx-auto relative">
               <div className="grid lg:grid-cols-[1fr_1fr] gap-6 lg:gap-10 items-center">
                 {/* Mascot */}
@@ -629,24 +832,45 @@ export default function LandingPage() {
                       filter: "blur(80px)",
                     }}
                   />
-                  <div className="relative drift z-10 w-[200px] sm:w-[330px] lg:w-[480px]">
-                    <Image src="/spike-mascot-pro.png" alt="Spike AI" width={520} height={520} priority className="relative w-full h-auto mascot-mono" />
-                  </div>
+                  <Tilt
+                    max={7}
+                    scale={1.01}
+                    glare={false}
+                    outerClassName="relative z-10 [perspective:900px]"
+                    className="w-[200px] sm:w-[330px] lg:w-[480px]"
+                  >
+                    <div className="drift">
+                      <Image src="/spike-mascot-pro.png" alt="Spike AI" width={520} height={520} priority className="relative w-full h-auto mascot-mono" />
+                    </div>
+                  </Tilt>
+                  <span aria-hidden className="float-dot absolute top-[16%] right-[14%] w-1.5 h-1.5" />
+                  <span aria-hidden className="float-dot absolute top-[62%] right-[9%] w-2 h-2" style={{ animationDelay: "-2.4s" }} />
+                  <span aria-hidden className="float-dot absolute top-[28%] left-[11%] w-1 h-1" style={{ animationDelay: "-4.8s" }} />
                 </div>
 
                 {/* Copy + quick form */}
                 <div className="order-1 lg:order-2 text-right">
-                  <div className="eyebrow mb-5 sm:mb-6"><span>חדש בישראל - לא עוד בוט. סוכן.</span></div>
+                  <div className="eyebrow mb-5 sm:mb-6"><span className="pulse-dot" aria-hidden /><span>חדש בישראל - לא עוד בוט. סוכן.</span></div>
 
                   <h1 className="text-4xl sm:text-5xl lg:text-[4.2rem] font-black leading-[1.06] tracking-[-0.035em] mb-5 sm:mb-6">
-                    צוות שלם שעובד בשבילך,{" "}
-                    <span className="sheen">בלי לבקש משכורת</span>
+                    <RiseWords text="צוות שלם שעובד בשבילך," />{" "}
+                    <RiseWords text="בלי לבקש משכורת" wordClass="sheen" delay={0.32} />
                   </h1>
 
-                  <p className="text-base sm:text-lg lg:text-xl text-[var(--text-2)] leading-relaxed mb-7 sm:mb-8 max-w-2xl">
+                  <motion.p
+                    initial={reduceMotion ? false : { opacity: 0, y: 14 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.7, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                    className="text-base sm:text-lg lg:text-xl text-[var(--text-2)] leading-relaxed mb-7 sm:mb-8 max-w-2xl"
+                  >
                     סוכני Spike עושים את העבודה שפעם היית משלם עליה אלפים: מניהול הרשתות ועד סינון לידים ובקרת איכות. כל העסק שלך מתופעל 24/7, בלי הוצאות שכר ובלי כאבי ראש.
-                  </p>
+                  </motion.p>
 
+                  <motion.div
+                    initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.7, delay: 0.58, ease: [0.22, 1, 0.36, 1] }}
+                  >
                   {!heroSubmitted ? (
                     <form onSubmit={handleHeroSubmit} className="space-y-3 mb-6">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -675,6 +899,7 @@ export default function LandingPage() {
                       <p className="text-base text-white/75">קיבלנו את הפרטים. נחזור אליך תוך 24 שעות.</p>
                     </div>
                   )}
+                  </motion.div>
 
                   <div className="flex flex-wrap gap-x-6 sm:gap-x-8 gap-y-2 text-xs sm:text-sm text-white/55">
                     <span className="flex items-center gap-1.5"><Check className="text-white" />הקמה תוך 7 ימים</span>
@@ -751,7 +976,31 @@ export default function LandingPage() {
               </Reveal>
 
               <div className="relative">
-                <div className="hidden lg:block absolute top-12 right-[16.6%] left-[16.6%] h-px bg-gradient-to-l from-transparent via-white/15 to-transparent pointer-events-none"></div>
+                <div className="hidden lg:block absolute top-12 right-[16.6%] left-[16.6%] pointer-events-none" aria-hidden>
+                  <svg className="w-full overflow-visible" height="2" viewBox="0 0 100 2" preserveAspectRatio="none">
+                    <defs>
+                      <linearGradient id="how-line" x1="100%" y1="0%" x2="0%" y2="0%">
+                        <stop offset="0%" stopColor="rgba(34,211,176,0)" />
+                        <stop offset="18%" stopColor="rgba(34,211,176,0.65)" />
+                        <stop offset="82%" stopColor="rgba(91,208,242,0.65)" />
+                        <stop offset="100%" stopColor="rgba(91,208,242,0)" />
+                      </linearGradient>
+                    </defs>
+                    <motion.line
+                      x1="100"
+                      y1="1"
+                      x2="0"
+                      y2="1"
+                      stroke="url(#how-line)"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      initial={reduceMotion ? undefined : { pathLength: 0 }}
+                      whileInView={reduceMotion ? undefined : { pathLength: 1 }}
+                      viewport={{ once: true, margin: "-120px" }}
+                      transition={{ duration: 1.3, ease: "easeInOut" }}
+                    />
+                  </svg>
+                </div>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 relative">
                   {[
                     { num: "01", title: "ממלאים טופס קצר", desc: "5 דקות. אתה מספר על העסק - איזה תחום, איך עובדים היום, ומה הכי כואב. זה הכל.", footer: "5 דקות מקסימום" },
@@ -791,6 +1040,7 @@ export default function LandingPage() {
                 </p>
               </Reveal>
               <Reveal delay={0.1}>
+                <Tilt max={3} scale={1.006} outerClassName="[perspective:1400px]">
                 <BrowserFrame
                   src="/shots/pipeline.png"
                   alt="Spike מזהה ליד חם בוואטסאפ ומכין טיוטת תגובה בזמן אמת"
@@ -798,6 +1048,7 @@ export default function LandingPage() {
                   height={1162}
                   label="app.spikeai.co.il/dashboard/showcase"
                 />
+                </Tilt>
                 <p className="mt-3 text-center text-xs text-white/35">להמחשה · נתוני דמו</p>
               </Reveal>
             </div>
@@ -818,7 +1069,13 @@ export default function LandingPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {agents.map((agent, index) => (
-                  <Reveal key={index} delay={(index % 3) * 0.1} className="agent-tile glass glass-hover rounded-2xl sm:rounded-3xl p-6 sm:p-8 relative">
+                  <Reveal key={index} delay={(index % 3) * 0.1} className="h-full">
+                    <Tilt
+                      max={8}
+                      scale={1.02}
+                      outerClassName="h-full [perspective:900px]"
+                      className="agent-tile glass spotlight-card rounded-2xl sm:rounded-3xl p-6 sm:p-8 relative h-full"
+                    >
                     <div className="relative z-10">
                       <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl border border-white/12 bg-white/[0.04] flex items-center justify-center mb-5">
                         <AgentGlyph name={agent.iconKey} className="agent-glyph" />
@@ -826,6 +1083,7 @@ export default function LandingPage() {
                       <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3 text-right">{agent.name}</h3>
                       <p className="text-[var(--text-2)] leading-relaxed text-right text-sm">{agent.description}</p>
                     </div>
+                    </Tilt>
                   </Reveal>
                 ))}
               </div>
@@ -845,12 +1103,14 @@ export default function LandingPage() {
                 </p>
               </Reveal>
               <Reveal delay={0.1} className="order-1 lg:order-2">
+                <Tilt max={5} scale={1.012} outerClassName="[perspective:1100px]">
                 <PhoneFrame
                   src="/shots/inventory.png"
                   alt="ניתוח מלאי של הסוכן: התראות על מוצרים שעומדים להיגמר וחיזוי ביקוש"
                   width={1261}
                   height={1291}
                 />
+                </Tilt>
               </Reveal>
             </div>
           </section>
@@ -868,6 +1128,7 @@ export default function LandingPage() {
                 </p>
               </Reveal>
               <Reveal delay={0.1}>
+                <Tilt max={3} scale={1.006} outerClassName="[perspective:1400px]">
                 <BrowserFrame
                   src="/shots/approvals.png"
                   alt="טיוטות פוסטים שהסוכן הכין, ממתינות לאישור או דחייה של בעל העסק"
@@ -875,6 +1136,7 @@ export default function LandingPage() {
                   height={1270}
                   label="app.spikeai.co.il/dashboard/approvals"
                 />
+                </Tilt>
               </Reveal>
             </div>
           </section>
@@ -896,6 +1158,7 @@ export default function LandingPage() {
             <p className="text-base sm:text-lg lg:text-xl text-white/80 leading-relaxed max-w-2xl mx-auto mb-9">
               השאר פרטים ונחזור אליך תוך 24 שעות עם הצעה אישית מותאמת לעסק שלך. בלי התחייבות, בלי לחץ.
             </p>
+            <Magnetic strength={0.25} className="inline-block">
             <LiquidButton
               size="xl"
               className="text-white border border-white/30 rounded-full text-base font-bold"
@@ -907,6 +1170,7 @@ export default function LandingPage() {
             >
               קבל הצעה אישית
             </LiquidButton>
+            </Magnetic>
           </div>
         </section>
 
@@ -943,7 +1207,7 @@ export default function LandingPage() {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 mb-8 sm:mb-12 items-stretch">
-                    <div className="glass rounded-2xl p-5 sm:p-6 order-2 md:order-1">
+                    <div className="glass spotlight-card rounded-2xl p-5 sm:p-6 order-2 md:order-1">
                       <div className="flex items-center gap-3 mb-4 sm:mb-5 pb-3 sm:pb-4 border-b border-white/10">
                         <h4 className="text-base sm:text-lg font-bold">מתחבר ל-</h4>
                       </div>
@@ -957,7 +1221,7 @@ export default function LandingPage() {
                       </ul>
                     </div>
 
-                    <div className="edge-shimmer glass rounded-2xl p-5 sm:p-6 lg:p-7 order-1 md:order-2 relative bg-white/[0.06] md:scale-[1.04]">
+                    <div className="edge-shimmer glass spotlight-card rounded-2xl p-5 sm:p-6 lg:p-7 order-1 md:order-2 relative bg-white/[0.06] md:scale-[1.04]">
                       <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-white text-[#08090A] font-bold text-xs px-4 py-1.5 rounded-full whitespace-nowrap z-10">
                         הלב של החבילה
                       </div>
@@ -977,7 +1241,7 @@ export default function LandingPage() {
                       </ul>
                     </div>
 
-                    <div className="glass rounded-2xl p-5 sm:p-6 order-3">
+                    <div className="glass spotlight-card rounded-2xl p-5 sm:p-6 order-3">
                       <div className="flex items-center gap-3 mb-4 sm:mb-5 pb-3 sm:pb-4 border-b border-white/10">
                         <h4 className="text-base sm:text-lg font-bold">השירות</h4>
                       </div>
@@ -993,9 +1257,11 @@ export default function LandingPage() {
                   </div>
 
                   <div className="text-center">
+                    <Magnetic strength={0.22} className="inline-flex">
                     <a href="#cta" className="inline-flex btn-primary px-10 sm:px-12 py-4 sm:py-5 text-base sm:text-lg">
                       קבל הצעה אישית
                     </a>
+                    </Magnetic>
                     <p className="text-xs sm:text-sm text-white/45 mt-3 sm:mt-4">בלי התחייבות. בלי לחץ של מכירה.</p>
                   </div>
                 </div>
@@ -1153,11 +1419,22 @@ export default function LandingPage() {
                           +
                         </span>
                       </button>
-                      {open && (
-                        <div className="px-5 sm:px-7 pb-5 sm:pb-6 text-sm lg:text-base text-[var(--text-2)] leading-relaxed text-right">
-                          {faq.answer}
-                        </div>
-                      )}
+                      <AnimatePresence initial={false}>
+                        {open && (
+                          <motion.div
+                            key="answer"
+                            initial={reduceMotion ? false : { height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={reduceMotion ? undefined : { height: 0, opacity: 0 }}
+                            transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
+                            className="overflow-hidden"
+                          >
+                            <div className="px-5 sm:px-7 pb-5 sm:pb-6 text-sm lg:text-base text-[var(--text-2)] leading-relaxed text-right">
+                              {faq.answer}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
                   );
                 })}

@@ -397,3 +397,114 @@ body {
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
 }
+
+/* ============================================================
+   PREMIUM MOTION LAYER — depth, life, micro-interactions
+   (pointer-driven effects are JS-gated to fine pointers;
+   everything below dies under prefers-reduced-motion via the
+   global kill switch above)
+   ============================================================ */
+
+/* ---------- Breathing aurora behind the hero ---------- */
+.aurora {
+  position: absolute;
+  inset: -18% -8% auto -8%;
+  height: 115%;
+  pointer-events: none;
+  filter: blur(90px);
+  opacity: 0.6;
+  background:
+    radial-gradient(38% 45% at 72% 16%, rgba(34, 211, 176, 0.18), transparent 62%),
+    radial-gradient(30% 40% at 20% 28%, rgba(91, 208, 242, 0.14), transparent 60%),
+    radial-gradient(46% 56% at 50% 82%, rgba(94, 234, 212, 0.07), transparent 65%);
+  animation: aurora-shift 16s ease-in-out infinite alternate;
+}
+@keyframes aurora-shift {
+  from { transform: translate3d(0, 0, 0) scale(1); opacity: 0.5; }
+  to   { transform: translate3d(0, -2.5%, 0) scale(1.06); opacity: 0.7; }
+}
+
+/* ---------- Live pulse dot (eyebrow) ---------- */
+.pulse-dot {
+  position: relative;
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 9999px;
+  background: var(--brand);
+  box-shadow: 0 0 10px rgba(34, 211, 176, 0.8);
+  flex-shrink: 0;
+}
+.pulse-dot::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  border: 1px solid rgba(34, 211, 176, 0.55);
+  animation: pulse-ring 2.4s ease-out infinite;
+}
+@keyframes pulse-ring {
+  0% { transform: scale(0.45); opacity: 1; }
+  80%, 100% { transform: scale(1.7); opacity: 0; }
+}
+
+/* ---------- Floating accent dots around the mascot ---------- */
+.float-dot {
+  display: block;
+  border-radius: 9999px;
+  background: rgba(94, 234, 212, 0.85);
+  box-shadow: 0 0 14px rgba(34, 211, 176, 0.8);
+  animation: dot-float 7s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes dot-float {
+  0%, 100% { transform: translateY(7px); opacity: 0.45; }
+  50% { transform: translateY(-11px); opacity: 1; }
+}
+
+/* ---------- Cursor-tracked glare inside Tilt cards ---------- */
+.tilt-glare {
+  background: radial-gradient(
+    420px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(255, 255, 255, 0.09),
+    rgba(94, 234, 212, 0.05) 45%,
+    transparent 65%
+  );
+  border-radius: inherit;
+}
+
+/* ---------- Cursor-tracked border spotlight ---------- */
+.spotlight-card {
+  position: relative;
+}
+.spotlight-card::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: radial-gradient(
+    340px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(94, 234, 212, 0.55),
+    rgba(91, 208, 242, 0.14) 45%,
+    transparent 72%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+.spotlight-card:hover::before {
+  opacity: 1;
+}
+
+/* ---------- Tactile press on buttons ---------- */
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0) scale(0.97);
+  box-shadow: 0 6px 22px rgba(34, 211, 176, 0.3);
+}
+.btn-ghost:active {
+  transform: scale(0.97);
+}
