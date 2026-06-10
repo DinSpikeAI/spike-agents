@@ -508,3 +508,130 @@ body {
 .btn-ghost:active {
   transform: scale(0.97);
 }
+
+/* ============================================================
+   BOLD LAYER — visible from second one, on every device,
+   no pointer needed. (All keyframes die under reduced-motion.)
+   ============================================================ */
+
+@property --ang  { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+@property --ang2 { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+@property --ang3 { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+
+/* Stronger breathing aurora */
+.aurora {
+  opacity: 0.9;
+  background:
+    radial-gradient(40% 48% at 72% 14%, rgba(34, 211, 176, 0.30), transparent 62%),
+    radial-gradient(32% 42% at 18% 26%, rgba(91, 208, 242, 0.24), transparent 60%),
+    radial-gradient(48% 58% at 50% 84%, rgba(94, 234, 212, 0.12), transparent 65%);
+}
+@keyframes aurora-shift {
+  from { transform: translate3d(0, 0, 0) scale(1); opacity: 0.7; }
+  to   { transform: translate3d(0, -2.5%, 0) scale(1.07); opacity: 1; }
+}
+
+/* Headline accent now glows */
+.sheen {
+  filter: drop-shadow(0 0 22px rgba(34, 211, 176, 0.40));
+}
+
+/* Primary CTA: living gradient, everywhere (hero, nav, pricing, sticky mobile) */
+.btn-primary {
+  background: linear-gradient(120deg, #22d3b0, #5bd0f2, #5eead4, #22d3b0);
+  background-size: 260% 260%;
+  animation: cta-flow 6s ease-in-out infinite;
+}
+@keyframes cta-flow {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Agent cards: an always-on conic light that travels along the border */
+.card-live { position: relative; }
+.card-live::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1.2px;
+  background: conic-gradient(
+    from var(--ang),
+    transparent 0%,
+    rgba(34, 211, 176, 0.65) 10%,
+    rgba(91, 208, 242, 0.65) 20%,
+    transparent 32%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: border-spin 8s linear infinite;
+  pointer-events: none;
+  opacity: 0.85;
+}
+@keyframes border-spin { to { --ang: 360deg; } }
+
+/* Cards gently float in place — staggered via inline animation-delay */
+.agent-float {
+  animation: idle-float 6s ease-in-out infinite;
+  will-change: transform;
+}
+@keyframes idle-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+
+/* Product screenshot frames: breathing teal glow */
+.glow-breathe { animation: glow-breathe 5s ease-in-out infinite; }
+@keyframes glow-breathe {
+  0%, 100% { box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5), 0 0 50px rgba(34, 211, 176, 0.13); }
+  50% { box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5), 0 0 95px rgba(34, 211, 176, 0.32); }
+}
+
+/* Video frame: a light that runs around the border */
+.video-frame::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 28px;
+  padding: 2px;
+  background: conic-gradient(
+    from var(--ang2),
+    transparent 0%,
+    rgba(34, 211, 176, 0.85) 12%,
+    rgba(91, 208, 242, 0.85) 22%,
+    transparent 34%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: border-spin2 6s linear infinite;
+  pointer-events: none;
+}
+@keyframes border-spin2 { to { --ang2: 360deg; } }
+
+/* Rotating light ring behind the hero mascot */
+.mascot-halo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(560px, 92%);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 9999px;
+  pointer-events: none;
+  background: conic-gradient(
+    from var(--ang3),
+    transparent,
+    rgba(34, 211, 176, 0.55) 16%,
+    transparent 30%,
+    transparent 54%,
+    rgba(91, 208, 242, 0.45) 70%,
+    transparent 84%
+  );
+  -webkit-mask: radial-gradient(closest-side, transparent calc(100% - 2.5px), #000 calc(100% - 1px));
+  mask: radial-gradient(closest-side, transparent calc(100% - 2.5px), #000 calc(100% - 1px));
+  animation: border-spin3 14s linear infinite;
+  opacity: 0.85;
+}
+@keyframes border-spin3 { to { --ang3: 360deg; } }

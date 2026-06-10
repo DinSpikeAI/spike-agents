@@ -470,7 +470,7 @@ function BrowserFrame({
   label: string;
 }) {
   return (
-    <div className="group/frame relative rounded-2xl border border-white/12 bg-white/[0.03] overflow-hidden shadow-[0_30px_80px_rgba(0,0,0,0.5),0_0_60px_rgba(34,211,176,0.12)]">
+    <div className="group/frame glow-breathe relative rounded-2xl border border-white/12 bg-white/[0.03] overflow-hidden shadow-[0_30px_80px_rgba(0,0,0,0.5),0_0_60px_rgba(34,211,176,0.12)]">
       <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/10 bg-white/[0.03]">
         <span className="flex gap-1.5" aria-hidden>
           <span className="w-2.5 h-2.5 rounded-full bg-white/15" />
@@ -507,7 +507,7 @@ function PhoneFrame({
   height: number;
 }) {
   return (
-    <div className="relative mx-auto w-[268px] sm:w-[300px] rounded-[2.4rem] border border-white/12 bg-[#0e0f11] p-2.5 shadow-[0_30px_80px_rgba(0,0,0,0.55),0_0_50px_rgba(34,211,176,0.16)]">
+    <div className="glow-breathe relative mx-auto w-[268px] sm:w-[300px] rounded-[2.4rem] border border-white/12 bg-[#0e0f11] p-2.5 shadow-[0_30px_80px_rgba(0,0,0,0.55),0_0_50px_rgba(34,211,176,0.16)]">
       <div className="flex items-center justify-center h-6" aria-hidden>
         <span className="w-16 h-1.5 rounded-full bg-white/15" />
       </div>
@@ -832,6 +832,7 @@ export default function LandingPage() {
                       filter: "blur(80px)",
                     }}
                   />
+                  <div className="mascot-halo" aria-hidden />
                   <Tilt
                     max={7}
                     scale={1.01}
@@ -1070,11 +1071,15 @@ export default function LandingPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {agents.map((agent, index) => (
                   <Reveal key={index} delay={(index % 3) * 0.1} className="h-full">
+                    <div
+                      className="agent-float h-full"
+                      style={{ animationDelay: `${(index % 3) * 0.7 + Math.floor(index / 3) * 0.35}s` }}
+                    >
                     <Tilt
                       max={8}
                       scale={1.02}
                       outerClassName="h-full [perspective:900px]"
-                      className="agent-tile glass spotlight-card rounded-2xl sm:rounded-3xl p-6 sm:p-8 relative h-full"
+                      className="agent-tile glass spotlight-card card-live rounded-2xl sm:rounded-3xl p-6 sm:p-8 relative h-full"
                     >
                     <div className="relative z-10">
                       <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl border border-white/12 bg-white/[0.04] flex items-center justify-center mb-5">
@@ -1084,6 +1089,7 @@ export default function LandingPage() {
                       <p className="text-[var(--text-2)] leading-relaxed text-right text-sm">{agent.description}</p>
                     </div>
                     </Tilt>
+                    </div>
                   </Reveal>
                 ))}
               </div>
