@@ -462,22 +462,29 @@ function BrowserFrame({
   width,
   height,
   label,
+  tone = "dark",
 }: {
   src: string;
   alt: string;
   width: number;
   height: number;
   label: string;
+  tone?: "dark" | "light";
 }) {
+  const dark = tone === "dark";
   return (
-    <div className="group/frame glow-breathe relative rounded-2xl border border-white/12 bg-white/[0.03] overflow-hidden shadow-[0_30px_80px_rgba(0,0,0,0.5),0_0_60px_rgba(34,211,176,0.12)]">
-      <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/10 bg-white/[0.03]">
+    <div
+      className={`group/frame glow-breathe relative rounded-2xl border overflow-hidden shadow-[0_30px_80px_rgba(0,0,0,0.5),0_0_60px_rgba(34,211,176,0.12)] ${
+        dark ? "border-white/12 bg-white/[0.03]" : "border-black/10 bg-white"
+      }`}
+    >
+      <div className={`flex items-center gap-2 px-4 py-2.5 border-b ${dark ? "border-white/10 bg-white/[0.03]" : "border-black/10 bg-black/[0.03]"}`}>
         <span className="flex gap-1.5" aria-hidden>
-          <span className="w-2.5 h-2.5 rounded-full bg-white/15" />
-          <span className="w-2.5 h-2.5 rounded-full bg-white/15" />
-          <span className="w-2.5 h-2.5 rounded-full bg-[#22D3B0]/60" />
+          <span className={`w-2.5 h-2.5 rounded-full ${dark ? "bg-white/15" : "bg-black/15"}`} />
+          <span className={`w-2.5 h-2.5 rounded-full ${dark ? "bg-white/15" : "bg-black/15"}`} />
+          <span className="w-2.5 h-2.5 rounded-full bg-[#16d3ab]/70" />
         </span>
-        <span dir="ltr" className="mx-auto font-grotesk text-[11px] tracking-wide text-white/40">
+        <span dir="ltr" className={`mx-auto font-grotesk text-[11px] tracking-wide ${dark ? "text-white/40" : "text-black/40"}`}>
           {label}
         </span>
       </div>
@@ -514,6 +521,138 @@ function PhoneFrame({
       <div className="overflow-hidden rounded-[1.8rem] bg-white">
         <Image src={src} alt={alt} width={width} height={height} unoptimized className="block w-full h-auto" />
       </div>
+    </div>
+  );
+}
+
+
+/* ===== Sticker badge ===== */
+function Sticker({ children, className }: { children: React.ReactNode; className?: string }) {
+  return <span className={"sticker " + (className ?? "")}>{children}</span>;
+}
+
+/* ===== Marquee strip ===== */
+function Marquee({ items, className }: { items: string[]; className?: string }) {
+  const row = (dup: boolean) => (
+    <div className="marquee-item" aria-hidden={dup}>
+      {items.map((t, i) => (
+        <span key={i} className="inline-flex items-center gap-12">
+          <span>{t}</span>
+          <span className="w-2 h-2 rounded-full bg-current opacity-40 inline-block" aria-hidden />
+        </span>
+      ))}
+    </div>
+  );
+  return (
+    <div className={"marquee " + (className ?? "")}>
+      <div className="marquee-track">
+        {row(false)}
+        {row(true)}
+      </div>
+    </div>
+  );
+}
+
+/* ===== Interactive approval demo — the Iron Rule as a toy ===== */
+const demoInbox = [
+  {
+    from: "דנה כהן",
+    tag: "ליד חם",
+    msg: "היי, אפשר תור למחר בבוקר? משהו ב-9:00?",
+    draft: "בוקר טוב דנה! מחר ב-9:00 פנוי לנו. לשריין לך?",
+  },
+  {
+    from: "יוסי לוי",
+    tag: "שאלת מחיר",
+    msg: "כמה עולה טיפול קרטין אצלכם?",
+    draft: "היי יוסי! קרטין מתחיל ב-450 ₪, תלוי באורך. רוצה ייעוץ קצר בטלפון?",
+  },
+  {
+    from: "גוגל ביזנס",
+    tag: "ביקורת חדשה",
+    msg: "מיכל השאירה 5 כוכבים: שירות מדהים, אחזור בקרוב!",
+    draft: "מיכל, תודה ענקית! מחכים לראות אותך שוב 💚",
+  },
+  {
+    from: "נועה ברק",
+    tag: "ליד חוזר",
+    msg: "דיברנו לפני חודש... זה עדיין רלוונטי?",
+    draft: "היי נועה, ברור! נשאר לך מקום. מתי נוח לך השבוע?",
+  },
+];
+
+function ApprovalDemo() {
+  const reduce = useReducedMotion();
+  const [idx, setIdx] = useState(0);
+  const [approved, setApproved] = useState(27);
+  const [flash, setFlash] = useState(false);
+  const item = demoInbox[idx % demoInbox.length];
+  const approve = () => {
+    setApproved((n) => n + 1);
+    setFlash(true);
+    window.setTimeout(() => setFlash(false), 900);
+    setIdx((i) => i + 1);
+  };
+  return (
+    <div className="relative w-full max-w-[460px] mx-auto">
+      <div className="flex items-center justify-between mb-3 px-1">
+        <span className="flex items-center gap-2 text-sm font-bold text-white/90">
+          <span className="pulse-dot" aria-hidden />
+          תיבת האישורים שלך
+        </span>
+        <span className="font-grotesk text-xs text-white/55" dir="ltr">
+          <span className="text-[var(--teal-soft)] font-bold">{approved}</span> אושרו היום
+        </span>
+      </div>
+
+      <AnimatePresence mode="popLayout" initial={false}>
+        <motion.div
+          key={idx}
+          initial={reduce ? false : { opacity: 0, y: 30, rotate: 1.5 }}
+          animate={{ opacity: 1, y: 0, rotate: 0 }}
+          exit={reduce ? undefined : { opacity: 0, y: -46, rotate: -4 }}
+          transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+          className="card-live glass rounded-3xl p-5 sm:p-6 relative"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <span className="font-bold text-white">{item.from}</span>
+            <span className="sticker sticker-teal !rotate-0 text-[11px] !py-1 !px-2.5">{item.tag}</span>
+          </div>
+
+          <div className="rounded-2xl rounded-tr-sm bg-white/[0.07] border border-white/10 px-4 py-3 text-sm leading-relaxed text-white/90 mb-3 w-fit max-w-[92%]">
+            {item.msg}
+          </div>
+
+          <p className="text-[11px] font-bold tracking-wide text-[var(--teal-soft)] mb-1.5">Spike ניסח עבורך:</p>
+          <div className="rounded-2xl rounded-tl-sm bg-[var(--teal)] text-[var(--ink)] font-semibold px-4 py-3 text-sm leading-relaxed mb-5 w-fit max-w-[92%] mr-auto">
+            {item.draft}
+          </div>
+
+          <div className="flex gap-2.5">
+            <button type="button" onClick={approve} className="btn-primary flex-1 py-3 text-sm">
+              אשר ✓
+            </button>
+            <button type="button" onClick={() => setIdx((i) => i + 1)} className="btn-ghost px-5 py-3 text-sm">
+              דלג
+            </button>
+          </div>
+        </motion.div>
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {flash && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, scale: 0.8 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -16 }}
+            className="absolute -top-4 right-6 z-10 sticker !rotate-2"
+          >
+            נשלח ✓
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <p className="mt-3 text-center text-[11px] text-white/40">דמו אינטראקטיבי · נתונים להמחשה בלבד</p>
     </div>
   );
 }
@@ -672,43 +811,6 @@ export default function LandingPage() {
   return (
     <>
       <style jsx global>{`
-        .mascot-mono {
-          filter: drop-shadow(0 24px 70px rgba(34, 211, 176, 0.30))
-            drop-shadow(0 0 40px rgba(91, 208, 242, 0.18));
-        }
-        @keyframes mono-drift {
-          0%, 100% { transform: translateY(-10px); }
-          50% { transform: translateY(10px); }
-        }
-        .drift { animation: mono-drift 6s ease-in-out infinite; }
-        @media (prefers-reduced-motion: reduce) {
-          .drift { animation: none; }
-        }
-        .agent-tile {
-          transition: transform 0.4s ease, border-color 0.4s ease,
-            background-color 0.4s ease;
-        }
-        .agent-tile:hover .agent-glyph { color: #fff; transform: translateY(-2px); }
-        .agent-glyph {
-          color: var(--brand-soft);
-          transition: color 0.4s ease, transform 0.4s ease;
-        }
-        .video-frame {
-          position: relative;
-          border-radius: 26px;
-          padding: 6px;
-          background: linear-gradient(135deg, rgba(34, 211, 176, 0.22), rgba(91, 208, 242, 0.12));
-          box-shadow: 0 0 60px rgba(34, 211, 176, 0.22), 0 20px 50px rgba(0, 0, 0, 0.5),
-            inset 0 0 0 1px rgba(94, 234, 212, 0.22);
-        }
-        .video-frame video {
-          display: block;
-          width: 100%;
-          height: auto;
-          border-radius: 20px;
-          background: #0e0f11;
-          aspect-ratio: 16 / 9;
-        }
         .consent-box {
           appearance: none;
           -webkit-appearance: none;
@@ -725,47 +827,47 @@ export default function LandingPage() {
           flex-shrink: 0;
         }
         .consent-box:hover { border-color: rgba(255, 255, 255, 0.6); }
-        .consent-box:checked { background: #ffffff; border-color: #ffffff; }
+        .consent-box:checked { background: #16d3ab; border-color: #16d3ab; }
         .consent-box:checked::after {
           content: "✓";
           position: absolute;
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%);
-          color: #08090a;
+          color: #04100d;
           font-weight: 900;
           font-size: 12px;
           line-height: 1;
         }
       `}</style>
 
-      <div className="grain relative">
+      <div className="grain relative overflow-x-clip">
         <ScrollProgress />
-        {/* ===== NAV ===== */}
-        <nav
-          dir="rtl"
-          className={`fixed top-0 inset-x-0 z-50 backdrop-blur-xl border-b transition-[background-color,border-color,box-shadow] duration-300 ${
-            scrolled
-              ? "bg-[#08090A]/85 border-white/10 shadow-[0_10px_30px_-12px_rgba(0,0,0,0.7)]"
-              : "bg-[#08090A]/45 border-white/[0.05]"
-          }`}
-        >
-          <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-12 py-3 sm:py-4 flex items-center justify-between gap-2">
+
+        {/* ===== NAV (floating pill) ===== */}
+        <nav dir="rtl" className="fixed top-0 inset-x-0 z-50 px-3 sm:px-6 pt-3">
+          <div
+            className={`max-w-[1200px] mx-auto flex items-center justify-between gap-2 rounded-2xl border px-3 sm:px-5 py-2.5 backdrop-blur-xl transition-[background-color,border-color,box-shadow] duration-300 ${
+              scrolled
+                ? "bg-[#04100d]/85 border-white/12 shadow-[0_10px_30px_-12px_rgba(0,0,0,0.7)]"
+                : "bg-[#04100d]/55 border-white/[0.07]"
+            }`}
+          >
             <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-              <div className="relative w-8 h-8 sm:w-10 sm:h-10">
-                <Image src="/spike-mascot.png" alt="Spike AI" fill sizes="40px" className="object-contain mascot-mono" />
+              <div className="relative w-8 h-8 sm:w-9 sm:h-9">
+                <Image src="/spike-mascot.png" alt="Spike AI" fill sizes="36px" className="object-contain mascot-mono" />
               </div>
               <div className="flex items-center gap-2">
-                <span className="font-grotesk text-base sm:text-xl font-bold tracking-tight text-white">Spike AI</span>
-                <span className="font-grotesk hidden sm:inline-block text-[10px] font-medium tracking-[0.25em] text-white/70 border border-white/15 px-2 py-0.5 rounded-full">
+                <span className="font-grotesk text-base sm:text-lg font-bold tracking-tight text-white">Spike AI</span>
+                <span className="font-grotesk hidden sm:inline-block text-[10px] font-medium tracking-[0.25em] text-[var(--teal-soft)] border border-[rgba(22,211,171,0.35)] px-2 py-0.5 rounded-full">
                   AGENTS
                 </span>
               </div>
             </div>
 
-            <div className="hidden md:flex items-center gap-8">
+            <div className="hidden md:flex items-center gap-7">
               {navLinks.map((l) => (
-                <a key={l.href} href={l.href} className="text-sm text-white/55 hover:text-white transition-colors">
+                <a key={l.href} href={l.href} className="text-sm text-white/60 hover:text-white transition-colors">
                   {l.label}
                 </a>
               ))}
@@ -789,7 +891,7 @@ export default function LandingPage() {
           </div>
 
           {mobileMenuOpen && (
-            <div className="md:hidden border-t border-white/10 bg-[#08090A]/95 backdrop-blur-xl">
+            <div className="md:hidden max-w-[1200px] mx-auto mt-2 rounded-2xl border border-white/10 bg-[#04100d]/95 backdrop-blur-xl overflow-hidden">
               <div className="px-4 py-4 flex flex-col gap-1">
                 {navLinks.map((l) => (
                   <a
@@ -809,351 +911,344 @@ export default function LandingPage() {
           )}
         </nav>
 
-        {/* ================= DARK: HERO + HOW + AGENTS ================= */}
-        <div dir="rtl" className="relative bg-[#08090A] text-white overflow-x-clip">
-          <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            <div className="ambient top-[-160px] left-1/2 -translate-x-1/2 w-[1100px] h-[680px]" />
-            <div className="ambient top-[1500px] right-[-150px] w-[640px] h-[640px]" />
-            <div className="ambient top-[2900px] left-[-150px] w-[600px] h-[600px]" />
-          </div>
-
-          {/* ===== HERO (dark, quiet) ===== */}
-          <section className="relative pt-28 pb-12 sm:pt-32 sm:pb-20 lg:pt-36 lg:pb-28 px-4 sm:px-6 lg:px-12">
-            <div className="aurora" aria-hidden />
-            <div className="max-w-[1280px] mx-auto relative">
-              <div className="grid lg:grid-cols-[1fr_1fr] gap-6 lg:gap-10 items-center">
-                {/* Mascot */}
-                <div className="relative flex items-center justify-center order-2 lg:order-1 min-h-[240px] sm:min-h-[360px] lg:min-h-[520px]">
-                  <div
-                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[560px] h-[560px] rounded-full pointer-events-none"
-                    style={{
-                      background:
-                        "radial-gradient(circle, rgba(34,211,176,0.22) 0%, rgba(91,208,242,0.10) 38%, transparent 70%)",
-                      filter: "blur(80px)",
-                    }}
-                  />
+        {/* ===== HERO — ink, with the interactive approval demo ===== */}
+        <section dir="rtl" className="zone-ink relative overflow-hidden pt-28 sm:pt-32 lg:pt-36 pb-16 sm:pb-24 px-4 sm:px-6 lg:px-12">
+          <div className="aurora" aria-hidden />
+          <div className="max-w-[1240px] mx-auto relative">
+            <div className="grid lg:grid-cols-2 gap-12 lg:gap-10 items-center">
+              {/* Interactive demo + mascot */}
+              <div className="relative order-2 lg:order-1">
+                <div className="relative h-[140px] sm:h-[175px] flex items-end justify-center -mb-6 z-10 pointer-events-none">
                   <div className="mascot-halo" aria-hidden />
-                  <Tilt
-                    max={7}
-                    scale={1.01}
-                    glare={false}
-                    outerClassName="relative z-10 [perspective:900px]"
-                    className="w-[200px] sm:w-[330px] lg:w-[480px]"
-                  >
-                    <div className="drift">
-                      <Image src="/spike-mascot-pro.png" alt="Spike AI" width={520} height={520} priority className="relative w-full h-auto mascot-mono" />
-                    </div>
-                  </Tilt>
-                  <span aria-hidden className="float-dot absolute top-[16%] right-[14%] w-1.5 h-1.5" />
-                  <span aria-hidden className="float-dot absolute top-[62%] right-[9%] w-2 h-2" style={{ animationDelay: "-2.4s" }} />
-                  <span aria-hidden className="float-dot absolute top-[28%] left-[11%] w-1 h-1" style={{ animationDelay: "-4.8s" }} />
-                </div>
-
-                {/* Copy + quick form */}
-                <div className="order-1 lg:order-2 text-right">
-                  <div className="eyebrow mb-5 sm:mb-6"><span className="pulse-dot" aria-hidden /><span>חדש בישראל - לא עוד בוט. סוכן.</span></div>
-
-                  <h1 className="text-4xl sm:text-5xl lg:text-[4.2rem] font-black leading-[1.06] tracking-[-0.035em] mb-5 sm:mb-6">
-                    <RiseWords text="צוות שלם שעובד בשבילך," />{" "}
-                    <RiseWords text="בלי לבקש משכורת" wordClass="sheen" delay={0.32} />
-                  </h1>
-
-                  <motion.p
-                    initial={reduceMotion ? false : { opacity: 0, y: 14 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.7, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                    className="text-base sm:text-lg lg:text-xl text-[var(--text-2)] leading-relaxed mb-7 sm:mb-8 max-w-2xl"
-                  >
-                    סוכני Spike עושים את העבודה שפעם היית משלם עליה אלפים: מניהול הרשתות ועד סינון לידים ובקרת איכות. כל העסק שלך מתופעל 24/7, בלי הוצאות שכר ובלי כאבי ראש.
-                  </motion.p>
-
-                  <motion.div
-                    initial={reduceMotion ? false : { opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.7, delay: 0.58, ease: [0.22, 1, 0.36, 1] }}
-                  >
-                  {!heroSubmitted ? (
-                    <form onSubmit={handleHeroSubmit} className="space-y-3 mb-6">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <input type="text" name="name" value={heroForm.name} onChange={handleHeroChange} placeholder="שם מלא" required className="field px-4 py-3.5" aria-label="שם מלא" />
-                        <input type="tel" name="phone" value={heroForm.phone} onChange={handleHeroChange} placeholder="טלפון" required className="field px-4 py-3.5" aria-label="טלפון" />
-                      </div>
-                      <input type="email" name="email" value={heroForm.email} onChange={handleHeroChange} placeholder="אימייל" required className="field px-4 py-3.5" aria-label="אימייל" />
-
-                      {heroError && (
-                        <div className="rounded-xl border border-white/25 bg-white/5 px-4 py-3 text-sm text-white/90 text-center">{heroError}</div>
-                      )}
-                      <button type="submit" disabled={heroSubmitting} className="w-full btn-primary px-8 py-4 text-base">
-                        {heroSubmitting ? "שולח..." : "קבל הצעה אישית"}
-                      </button>
-                      <p className="text-xs text-white/45 text-center">נחזור אליך תוך 24 שעות. בלי התחייבות.</p>
-                      <p className="text-[11px] text-white/35 text-center leading-relaxed mt-2">
-                        בלחיצה על &quot;קבל הצעה אישית&quot; אני מסכים/ה ל
-                        <Link href="/privacy" target="_blank" rel="noopener" className="text-white/55 hover:text-white underline underline-offset-2">מדיניות הפרטיות</Link>
-                        {" "}ול
-                        <Link href="/terms" target="_blank" rel="noopener" className="text-white/55 hover:text-white underline underline-offset-2">תנאי השימוש</Link>.
-                      </p>
-                    </form>
-                  ) : (
-                    <div className="glass rounded-2xl p-6 mb-6 text-center">
-                      <h3 className="text-2xl font-black mb-2">תודה <span className="sheen">{heroForm.name}!</span></h3>
-                      <p className="text-base text-white/75">קיבלנו את הפרטים. נחזור אליך תוך 24 שעות.</p>
-                    </div>
-                  )}
-                  </motion.div>
-
-                  <div className="flex flex-wrap gap-x-6 sm:gap-x-8 gap-y-2 text-xs sm:text-sm text-white/55">
-                    <span className="flex items-center gap-1.5"><Check className="text-white" />הקמה תוך 7 ימים</span>
-                    <span className="flex items-center gap-1.5"><Check className="text-white" />בלי התחייבות</span>
-                    <span className="flex items-center gap-1.5"><Check className="text-white" />עברית מלאה</span>
+                  <div className="drift w-[140px] sm:w-[175px]">
+                    <Image src="/spike-mascot-pro.png" alt="Spike AI" width={520} height={520} priority className="w-full h-auto mascot-mono" />
                   </div>
+                  <span aria-hidden className="float-dot absolute top-[6%] right-[18%] w-1.5 h-1.5" />
+                  <span aria-hidden className="float-dot absolute top-[44%] left-[16%] w-2 h-2" style={{ animationDelay: "-2.4s" }} />
+                </div>
+                <ApprovalDemo />
+              </div>
+
+              {/* Copy + quick form */}
+              <div className="order-1 lg:order-2 text-right">
+                <motion.div
+                  initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                  className="mb-6"
+                >
+                  <Sticker>חדש בישראל · לא עוד בוט. סוכן.</Sticker>
+                </motion.div>
+
+                <h1 className="text-[clamp(2.6rem,6.2vw,4.9rem)] font-black leading-[1.06] tracking-[-0.03em] mb-6">
+                  <RiseWords text="צוות שלם שעובד בשבילך," />{" "}
+                  <RiseWords text="בלי לבקש משכורת" wordClass="hl" delay={0.32} />
+                </h1>
+
+                <motion.p
+                  initial={reduceMotion ? false : { opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.7, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                  className="text-base sm:text-lg lg:text-xl text-[var(--text-2)] leading-relaxed mb-7 sm:mb-8 max-w-2xl"
+                >
+                  סוכני Spike עושים את העבודה שפעם היית משלם עליה אלפים: מניהול הרשתות ועד סינון לידים ובקרת איכות. כל העסק שלך מתופעל 24/7, בלי הוצאות שכר ובלי כאבי ראש.
+                </motion.p>
+
+                <motion.div
+                  initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.7, delay: 0.58, ease: [0.22, 1, 0.36, 1] }}
+                >
+                {!heroSubmitted ? (
+                  <form onSubmit={handleHeroSubmit} className="space-y-3 mb-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <input type="text" name="name" value={heroForm.name} onChange={handleHeroChange} placeholder="שם מלא" required className="field px-4 py-3.5" aria-label="שם מלא" />
+                      <input type="tel" name="phone" value={heroForm.phone} onChange={handleHeroChange} placeholder="טלפון" required className="field px-4 py-3.5" aria-label="טלפון" />
+                    </div>
+                    <input type="email" name="email" value={heroForm.email} onChange={handleHeroChange} placeholder="אימייל" required className="field px-4 py-3.5" aria-label="אימייל" />
+
+                    {heroError && (
+                      <div className="rounded-xl border border-white/25 bg-white/5 px-4 py-3 text-sm text-white/90 text-center">{heroError}</div>
+                    )}
+                    <button type="submit" disabled={heroSubmitting} className="w-full btn-primary px-8 py-4 text-base">
+                      {heroSubmitting ? "שולח..." : "קבל הצעה אישית"}
+                    </button>
+                    <p className="text-xs text-white/45 text-center">נחזור אליך תוך 24 שעות. בלי התחייבות.</p>
+                    <p className="text-[11px] text-white/35 text-center leading-relaxed mt-2">
+                      בלחיצה על &quot;קבל הצעה אישית&quot; אני מסכים/ה ל
+                      <Link href="/privacy" target="_blank" rel="noopener" className="text-white/55 hover:text-white underline underline-offset-2">מדיניות הפרטיות</Link>
+                      {" "}ול
+                      <Link href="/terms" target="_blank" rel="noopener" className="text-white/55 hover:text-white underline underline-offset-2">תנאי השימוש</Link>.
+                    </p>
+                  </form>
+                ) : (
+                  <div className="glass rounded-2xl p-6 mb-6 text-center">
+                    <h3 className="text-2xl font-black mb-2">תודה <span className="hl">{heroForm.name}!</span></h3>
+                    <p className="text-base text-white/75">קיבלנו את הפרטים. נחזור אליך תוך 24 שעות.</p>
+                  </div>
+                )}
+                </motion.div>
+
+                <div className="flex flex-wrap gap-x-6 sm:gap-x-8 gap-y-2 text-xs sm:text-sm text-white/55">
+                  <span className="flex items-center gap-1.5"><Check className="text-[var(--teal-soft)]" />הקמה תוך 7 ימים</span>
+                  <span className="flex items-center gap-1.5"><Check className="text-[var(--teal-soft)]" />בלי התחייבות</span>
+                  <span className="flex items-center gap-1.5"><Check className="text-[var(--teal-soft)]" />עברית מלאה</span>
                 </div>
               </div>
             </div>
-          </section>
+          </div>
+        </section>
 
-          {/* ===== VIDEO (normal, right after hero) ===== */}
-          <section id="video" className="relative pt-2 pb-12 sm:pb-16 lg:pb-20 px-4 sm:px-6 lg:px-12">
-            <div className="max-w-[1100px] mx-auto relative">
-              <Reveal className="text-center mb-6 sm:mb-8">
-                <div className="eyebrow mb-4"><span>צפה בפעולה</span></div>
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black leading-[1.08] tracking-[-0.03em] mb-3">
-                  ראה את הסוכנים <span className="sheen">בפעולה</span>
+        {/* ===== MARQUEE ===== */}
+        <div dir="rtl" className="zone-ink border-y border-white/10 py-4 sm:py-5 text-lg sm:text-2xl font-black text-[var(--teal-soft)]">
+          <Marquee items={["AI מסמן, בעלים מחליט", "9 סוכנים שעובדים בשבילך", "דוחות בוואטסאפ", "עברית מלאה", "24/7", "בלי הוצאות שכר"]} />
+        </div>
+
+        {/* ===== VIDEO — full teal ===== */}
+        <section id="video" dir="rtl" className="zone-teal relative py-16 sm:py-24 px-4 sm:px-6 lg:px-12">
+          <div className="max-w-[1060px] mx-auto relative">
+            <Reveal className="text-center mb-8 sm:mb-10">
+              <div className="mb-5"><Sticker>60 שניות</Sticker></div>
+              <h2 className="text-[clamp(2rem,4.6vw,3.6rem)] font-black leading-[1.07] tracking-[-0.03em] mb-3">
+                ראה את הסוכנים <span className="hl">בפעולה</span>
+              </h2>
+              <p className="text-base sm:text-lg text-soft max-w-xl mx-auto">
+                60 שניות שמסבירות הכל. מה הם עושים, איך הם עובדים, ואיך זה משנה את היום שלך.
+              </p>
+            </Reveal>
+            <Reveal delay={0.1} className="video-frame">
+              <video controls preload="metadata" playsInline poster="/og-image.png">
+                <source src="/spike-explainer.mp4" type="video/mp4" />
+                הדפדפן שלך לא תומך בנגן וידאו.
+              </video>
+            </Reveal>
+          </div>
+        </section>
+
+        {/* ===== PRODUCT — paper proof zone ===== */}
+        <section id="product" dir="rtl" className="zone-paper relative overflow-hidden">
+          <div className="pt-16 sm:pt-20 text-center px-4">
+            <div className="eyebrow mb-5"><span>המוצר</span></div>
+          </div>
+          <ContainerScroll
+            titleComponent={
+              <div className="px-4 pb-6">
+                <h2 className="text-3xl sm:text-4xl lg:text-6xl font-black leading-[1.08] tracking-[-0.035em] text-[#0a1411] mb-4">
+                  כל הסוכנים שלך, <span className="hl">במסך אחד</span>
                 </h2>
-                <p className="text-base text-[var(--text-2)] max-w-xl mx-auto">
-                  60 שניות שמסבירות הכל. מה הם עושים, איך הם עובדים, ואיך זה משנה את היום שלך.
+                <p className="text-base sm:text-lg text-soft leading-relaxed max-w-2xl mx-auto">
+                  רואים מה כל סוכן עשה, מתי, ומריצים בלחיצה. שליטה מלאה על העסק - בלי שום דבר טכני.
                 </p>
-              </Reveal>
-              <Reveal delay={0.1} className="video-frame">
-                <video controls preload="metadata" playsInline poster="/og-image.png">
-                  <source src="/spike-explainer.mp4" type="video/mp4" />
-                  הדפדפן שלך לא תומך בנגן וידאו.
-                </video>
-              </Reveal>
-            </div>
-          </section>
-
-          {/* ===== LIGHT: PRODUCT SHOWCASE (tablet) — right under the video ===== */}
-          <section id="product" className="zone-light relative overflow-hidden">
-            <div className="pt-16 sm:pt-20 text-center px-4">
-              <div className="eyebrow mb-5"><span>המוצר</span></div>
-            </div>
-            <ContainerScroll
-              titleComponent={
-                <div className="px-4 pb-6">
-                  <h2 className="text-3xl sm:text-4xl lg:text-6xl font-black leading-[1.08] tracking-[-0.035em] text-[#0a0a0a] mb-4">
-                    כל הסוכנים שלך, <span className="sheen">במסך אחד</span>
-                  </h2>
-                  <p className="text-base sm:text-lg text-soft leading-relaxed max-w-2xl mx-auto">
-                    רואים מה כל סוכן עשה, מתי, ומריצים בלחיצה. שליטה מלאה על העסק - בלי שום דבר טכני.
-                  </p>
-                </div>
-              }
-            >
-              <div className="relative h-full w-full bg-white">
-                <Image
-                  src="/shots/agents.png"
-                  alt="דשבורד הסוכנים של Spike - כל הסוכנים, סטטוסים והרצה ידנית במסך אחד"
-                  fill
-                  unoptimized
-                  sizes="(max-width: 768px) 100vw, 1024px"
-                  className="object-cover object-top"
-                />
               </div>
-            </ContainerScroll>
-          </section>
-
-          {/* ===== HOW IT WORKS ===== */}
-          <section id="how" className="relative py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-12">
-            <div className="max-w-[1280px] mx-auto relative">
-              <Reveal className="text-center mb-12 sm:mb-16 lg:mb-20">
-                <div className="eyebrow mb-5"><span>איך זה עובד</span></div>
-                <h2 className="text-3xl sm:text-4xl lg:text-6xl font-black leading-[1.08] tracking-[-0.035em] mb-5 sm:mb-6">
-                  3 שלבים. <span className="sheen">תוך 7 ימים.</span>
-                </h2>
-                <p className="text-base sm:text-lg lg:text-xl text-[var(--text-2)] leading-relaxed max-w-2xl mx-auto">
-                  מהקליק הראשון עד שהסוכן שלך כבר עובד - תוך שבוע. בלי בירוקרטיה, בלי בלאגן.
-                </p>
-              </Reveal>
-
-              <div className="relative">
-                <div className="hidden lg:block absolute top-12 right-[16.6%] left-[16.6%] pointer-events-none" aria-hidden>
-                  <svg className="w-full overflow-visible" height="2" viewBox="0 0 100 2" preserveAspectRatio="none">
-                    <defs>
-                      <linearGradient id="how-line" x1="100%" y1="0%" x2="0%" y2="0%">
-                        <stop offset="0%" stopColor="rgba(34,211,176,0)" />
-                        <stop offset="18%" stopColor="rgba(34,211,176,0.65)" />
-                        <stop offset="82%" stopColor="rgba(91,208,242,0.65)" />
-                        <stop offset="100%" stopColor="rgba(91,208,242,0)" />
-                      </linearGradient>
-                    </defs>
-                    <motion.line
-                      x1="100"
-                      y1="1"
-                      x2="0"
-                      y2="1"
-                      stroke="url(#how-line)"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      initial={reduceMotion ? undefined : { pathLength: 0 }}
-                      whileInView={reduceMotion ? undefined : { pathLength: 1 }}
-                      viewport={{ once: true, margin: "-120px" }}
-                      transition={{ duration: 1.3, ease: "easeInOut" }}
-                    />
-                  </svg>
-                </div>
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 relative">
-                  {[
-                    { num: "01", title: "ממלאים טופס קצר", desc: "5 דקות. אתה מספר על העסק - איזה תחום, איך עובדים היום, ומה הכי כואב. זה הכל.", footer: "5 דקות מקסימום" },
-                    { num: "02", title: "שיחה איתנו", desc: "אנחנו לומדים את העסק שלך - איזה סוכנים יביאו לך הכי הרבה ערך. תוך כמה ימים מקבלים הצעה מותאמת.", footer: "בלי לחץ של מכירה" },
-                    { num: "03", title: "הסוכן מתחיל לעבוד", desc: "אישרת את ההצעה? תוך 7 ימים הסוכן שלך כבר חי, מנתח, ושולח לך דוחות לוואטסאפ כל בוקר.", footer: "תוך 7 ימים" },
-                  ].map((step, i) => (
-                    <Reveal key={i} delay={i * 0.12} className="glass glass-hover rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-10 relative overflow-hidden">
-                      <div className="font-grotesk absolute top-2 left-4 sm:top-4 sm:left-6 text-6xl sm:text-7xl lg:text-8xl font-bold text-white/[0.04] leading-none select-none">{step.num}</div>
-                      <div className="relative z-10">
-                        <div className="font-grotesk w-16 h-16 lg:w-20 lg:h-20 rounded-2xl border border-white/15 bg-white/5 flex items-center justify-center mb-5 sm:mb-6 mx-auto lg:mx-0">
-                          <span className="text-2xl sm:text-3xl font-bold text-white">{step.num}</span>
-                        </div>
-                        <h3 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 text-center lg:text-right">{step.title}</h3>
-                        <p className="text-sm sm:text-base text-[var(--text-2)] leading-relaxed text-center lg:text-right mb-4">{step.desc}</p>
-                        <div className="flex items-center gap-2 text-xs sm:text-sm text-white/70 justify-center lg:justify-start">
-                          <Check className="text-white" />
-                          <span>{step.footer}</span>
-                        </div>
-                      </div>
-                    </Reveal>
-                  ))}
-                </div>
-              </div>
+            }
+          >
+            <div className="relative h-full w-full bg-white">
+              <Image
+                src="/shots/agents.png"
+                alt="דשבורד הסוכנים של Spike - כל הסוכנים, סטטוסים והרצה ידנית במסך אחד"
+                fill
+                unoptimized
+                sizes="(max-width: 768px) 100vw, 1024px"
+                className="object-cover object-top"
+              />
             </div>
-          </section>
+          </ContainerScroll>
 
-          {/* ===== MAGIC MOMENT — real-time pipeline (real product screenshot) ===== */}
-          <section id="magic" className="relative py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-12">
-            <div className="max-w-[1100px] mx-auto relative">
-              <Reveal className="text-center mb-10 sm:mb-12">
-                <div className="eyebrow mb-5"><span>בזמן אמת</span></div>
-                <h2 className="text-3xl sm:text-4xl lg:text-6xl font-black leading-[1.08] tracking-[-0.035em] mb-5 sm:mb-6">
-                  תראה את הקסם <span className="sheen">בזמן אמת</span>
-                </h2>
-                <p className="text-base sm:text-lg lg:text-xl text-[var(--text-2)] leading-relaxed max-w-2xl mx-auto">
-                  הודעת וואטסאפ נכנסת מליד חם. הסוכן מסווג, מתעדף, ומכין טיוטת תגובה - תוך 15 שניות. אתה רק מאשר.
-                </p>
-              </Reveal>
-              <Reveal delay={0.1}>
-                <Tilt max={3} scale={1.006} outerClassName="[perspective:1400px]">
+          <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-12 pb-16 sm:pb-24 grid lg:grid-cols-2 gap-12 lg:gap-14 items-start">
+            <Reveal>
+              <h3 className="text-2xl sm:text-3xl font-black leading-tight mb-3">
+                תראה את הקסם <span className="hl">בזמן אמת</span>
+              </h3>
+              <p className="text-base text-soft leading-relaxed mb-6 max-w-xl">
+                הודעת וואטסאפ נכנסת מליד חם. הסוכן מסווג, מתעדף, ומכין טיוטת תגובה - תוך 15 שניות. אתה רק מאשר.
+              </p>
+              <Tilt max={3} scale={1.006} outerClassName="[perspective:1400px]">
                 <BrowserFrame
+                  tone="light"
                   src="/shots/pipeline.png"
                   alt="Spike מזהה ליד חם בוואטסאפ ומכין טיוטת תגובה בזמן אמת"
                   width={1552}
                   height={1162}
                   label="app.spikeai.co.il/dashboard/showcase"
                 />
-                </Tilt>
-                <p className="mt-3 text-center text-xs text-white/35">להמחשה · נתוני דמו</p>
-              </Reveal>
-            </div>
-          </section>
+              </Tilt>
+              <p className="mt-3 text-center text-xs text-black/40">להמחשה · נתוני דמו</p>
+            </Reveal>
 
-          {/* ===== AGENTS ===== */}
-          <section id="agents" className="relative py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-12">
-            <div className="max-w-[1280px] mx-auto relative">
-              <Reveal className="text-center mb-12 sm:mb-16 lg:mb-20">
-                <div className="eyebrow mb-5"><span>הצוות שלך</span></div>
-                <h2 className="text-3xl sm:text-4xl lg:text-6xl font-black leading-[1.08] tracking-[-0.035em] mb-5 sm:mb-6">
-                  הצוות <span className="sheen">שעובד בשבילך</span>
-                </h2>
-                <p className="text-base sm:text-lg lg:text-xl text-[var(--text-2)] leading-relaxed max-w-2xl mx-auto">
-                  כל סוכן הוא מומחה בתחום שלו. ביחד הם מטפלים בכל הצדדים של העסק - מהבוקר ועד הלילה.
-                </p>
-              </Reveal>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                {agents.map((agent, index) => (
-                  <Reveal key={index} delay={(index % 3) * 0.1} className="h-full">
-                    <div
-                      className="agent-float h-full"
-                      style={{ animationDelay: `${(index % 3) * 0.7 + Math.floor(index / 3) * 0.35}s` }}
-                    >
-                    <Tilt
-                      max={8}
-                      scale={1.02}
-                      outerClassName="h-full [perspective:900px]"
-                      className="agent-tile glass spotlight-card card-live rounded-2xl sm:rounded-3xl p-6 sm:p-8 relative h-full"
-                    >
-                    <div className="relative z-10">
-                      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl border border-white/12 bg-white/[0.04] flex items-center justify-center mb-5">
-                        <AgentGlyph name={agent.iconKey} className="agent-glyph" />
-                      </div>
-                      <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3 text-right">{agent.name}</h3>
-                      <p className="text-[var(--text-2)] leading-relaxed text-right text-sm">{agent.description}</p>
-                    </div>
-                    </Tilt>
-                    </div>
-                  </Reveal>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          {/* ===== INSIGHT — inventory foresight (real product screenshot, phone frame) ===== */}
-          <section id="insight" className="relative py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-12">
-            <div className="max-w-[1100px] mx-auto grid lg:grid-cols-2 gap-8 lg:gap-14 items-center">
-              <Reveal className="text-center lg:text-right order-2 lg:order-1">
-                <div className="eyebrow mb-5"><span>תובנה</span></div>
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black leading-[1.08] tracking-[-0.035em] mb-5">
-                  יודע מה אוזל, <span className="sheen">לפני שזה קורה</span>
-                </h2>
-                <p className="text-base sm:text-lg text-[var(--text-2)] leading-relaxed max-w-xl mx-auto lg:mx-0">
-                  הסוכן סורק את המלאי, חוזה ביקוש, ומסמן בדיוק מה צריך הזמנה - לפני שנגמר. דוגמה אמיתית מתוך המערכת.
-                </p>
-              </Reveal>
-              <Reveal delay={0.1} className="order-1 lg:order-2">
-                <Tilt max={5} scale={1.012} outerClassName="[perspective:1100px]">
+            <Reveal delay={0.1}>
+              <h3 className="text-2xl sm:text-3xl font-black leading-tight mb-3">
+                יודע מה אוזל, <span className="hl">לפני שזה קורה</span>
+              </h3>
+              <p className="text-base text-soft leading-relaxed mb-6 max-w-xl">
+                הסוכן סורק את המלאי, חוזה ביקוש, ומסמן בדיוק מה צריך הזמנה - לפני שנגמר. דוגמה אמיתית מתוך המערכת.
+              </p>
+              <Tilt max={5} scale={1.012} outerClassName="[perspective:1100px]">
                 <PhoneFrame
                   src="/shots/inventory.png"
                   alt="ניתוח מלאי של הסוכן: התראות על מוצרים שעומדים להיגמר וחיזוי ביקוש"
                   width={1261}
                   height={1291}
                 />
-                </Tilt>
-              </Reveal>
-            </div>
-          </section>
+              </Tilt>
+            </Reveal>
+          </div>
+        </section>
 
-          {/* ===== APPROVALS — AI flags, owner decides (real product screenshot) ===== */}
-          <section id="approvals" className="relative py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-12">
-            <div className="max-w-[1100px] mx-auto relative">
-              <Reveal className="text-center mb-10 sm:mb-12">
-                <div className="eyebrow mb-5"><span>אתה בשליטה</span></div>
-                <h2 className="text-3xl sm:text-4xl lg:text-6xl font-black leading-[1.08] tracking-[-0.035em] mb-5 sm:mb-6">
-                  AI מסמן. <span className="sheen">אתה מחליט.</span>
-                </h2>
-                <p className="text-base sm:text-lg lg:text-xl text-[var(--text-2)] leading-relaxed max-w-2xl mx-auto">
-                  כל פעולה היא טיוטה שמחכה לך. מאשר בלחיצה - ואז נשלח. אף פעם לא אוטומטית, אף פעם לא בלי האישור שלך.
-                </p>
-              </Reveal>
-              <Reveal delay={0.1}>
-                <Tilt max={3} scale={1.006} outerClassName="[perspective:1400px]">
+        {/* ===== HOW IT WORKS — ink ===== */}
+        <section id="how" dir="rtl" className="zone-ink relative py-16 sm:py-24 px-4 sm:px-6 lg:px-12">
+          <div className="max-w-[1240px] mx-auto relative">
+            <Reveal className="text-center mb-12 sm:mb-16">
+              <div className="eyebrow mb-5"><span>איך זה עובד</span></div>
+              <h2 className="text-[clamp(2rem,5vw,3.8rem)] font-black leading-[1.07] tracking-[-0.03em] mb-5">
+                3 שלבים. <span className="hl">תוך 7 ימים.</span>
+              </h2>
+              <p className="text-base sm:text-lg lg:text-xl text-[var(--text-2)] leading-relaxed max-w-2xl mx-auto">
+                מהקליק הראשון עד שהסוכן שלך כבר עובד - תוך שבוע. בלי בירוקרטיה, בלי בלאגן.
+              </p>
+            </Reveal>
+
+            <div className="relative">
+              <div className="hidden lg:block absolute top-14 right-[16.6%] left-[16.6%] pointer-events-none" aria-hidden>
+                <svg className="w-full overflow-visible" height="2" viewBox="0 0 100 2" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="how-line" x1="100%" y1="0%" x2="0%" y2="0%">
+                      <stop offset="0%" stopColor="rgba(22,211,171,0)" />
+                      <stop offset="18%" stopColor="rgba(22,211,171,0.65)" />
+                      <stop offset="82%" stopColor="rgba(91,208,242,0.65)" />
+                      <stop offset="100%" stopColor="rgba(91,208,242,0)" />
+                    </linearGradient>
+                  </defs>
+                  <motion.line
+                    x1="100" y1="1" x2="0" y2="1"
+                    stroke="url(#how-line)" strokeWidth="2" strokeLinecap="round"
+                    initial={reduceMotion ? undefined : { pathLength: 0 }}
+                    whileInView={reduceMotion ? undefined : { pathLength: 1 }}
+                    viewport={{ once: true, margin: "-120px" }}
+                    transition={{ duration: 1.3, ease: "easeInOut" }}
+                  />
+                </svg>
+              </div>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-8 relative">
+                {[
+                  { num: "01", title: "ממלאים טופס קצר", desc: "5 דקות. אתה מספר על העסק - איזה תחום, איך עובדים היום, ומה הכי כואב. זה הכל.", footer: "5 דקות מקסימום" },
+                  { num: "02", title: "שיחה איתנו", desc: "אנחנו לומדים את העסק שלך - איזה סוכנים יביאו לך הכי הרבה ערך. תוך כמה ימים מקבלים הצעה מותאמת.", footer: "בלי לחץ של מכירה" },
+                  { num: "03", title: "הסוכן מתחיל לעבוד", desc: "אישרת את ההצעה? תוך 7 ימים הסוכן שלך כבר חי, מנתח, ושולח לך דוחות לוואטסאפ כל בוקר.", footer: "תוך 7 ימים" },
+                ].map((step, i) => (
+                  <Reveal key={i} delay={i * 0.12} className="glass glass-hover rounded-3xl p-6 sm:p-8 lg:p-10 relative overflow-hidden">
+                    <div className="num-ghost font-grotesk absolute -top-4 left-3 text-[6.5rem] lg:text-[8.5rem] select-none" aria-hidden>{step.num}</div>
+                    <div className="relative z-10">
+                      <div className="font-grotesk w-16 h-16 rounded-2xl flex items-center justify-center mb-6 mx-auto lg:mx-0 text-2xl font-bold"
+                        style={{ background: "linear-gradient(135deg, var(--teal), var(--teal-2))", color: "var(--ink)" }}>
+                        {step.num}
+                      </div>
+                      <h3 className="text-xl sm:text-2xl font-bold mb-2.5 text-center lg:text-right">{step.title}</h3>
+                      <p className="text-sm sm:text-base text-[var(--text-2)] leading-relaxed text-center lg:text-right mb-4">{step.desc}</p>
+                      <div className="flex items-center gap-2 text-xs sm:text-sm text-white/70 justify-center lg:justify-start">
+                        <Check className="text-[var(--teal-soft)]" />
+                        <span>{step.footer}</span>
+                      </div>
+                    </div>
+                  </Reveal>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ===== AGENTS — bento grid ===== */}
+        <section id="agents" dir="rtl" className="zone-ink relative py-16 sm:py-24 px-4 sm:px-6 lg:px-12">
+          <div className="max-w-[1240px] mx-auto relative">
+            <Reveal className="text-center mb-12 sm:mb-16">
+              <div className="eyebrow mb-5"><span>הצוות שלך</span></div>
+              <h2 className="text-[clamp(2rem,5vw,3.8rem)] font-black leading-[1.07] tracking-[-0.03em] mb-5">
+                הצוות <span className="hl">שעובד בשבילך</span>
+              </h2>
+              <p className="text-base sm:text-lg lg:text-xl text-[var(--text-2)] leading-relaxed max-w-2xl mx-auto">
+                כל סוכן הוא מומחה בתחום שלו. ביחד הם מטפלים בכל הצדדים של העסק - מהבוקר ועד הלילה.
+              </p>
+            </Reveal>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 sm:gap-5">
+              {agents.map((agent, index) => {
+                const featured = index === 0;
+                return (
+                  <Reveal
+                    key={index}
+                    delay={(index % 3) * 0.08}
+                    className={`h-full ${featured ? "sm:col-span-2 lg:col-span-4" : "lg:col-span-2"}`}
+                  >
+                    <div
+                      className="agent-float h-full"
+                      style={{ animationDelay: `${(index % 3) * 0.7 + Math.floor(index / 3) * 0.35}s` }}
+                    >
+                      <Tilt
+                        max={8}
+                        scale={1.02}
+                        outerClassName="h-full [perspective:900px]"
+                        className="card-live spotlight-card glass rounded-3xl p-6 sm:p-8 relative h-full"
+                      >
+                        <div className="relative z-10">
+                          <div
+                            className="w-14 h-14 rounded-2xl flex items-center justify-center mb-5"
+                            style={{ background: "linear-gradient(135deg, var(--teal), var(--teal-2))", color: "var(--ink)" }}
+                          >
+                            <AgentGlyph name={agent.iconKey} />
+                          </div>
+                          <h3 className={`${featured ? "text-2xl sm:text-3xl" : "text-lg sm:text-xl"} font-bold mb-2.5 text-right`}>{agent.name}</h3>
+                          <p className="text-[var(--text-2)] leading-relaxed text-right text-sm max-w-xl">{agent.description}</p>
+                          {featured && (
+                            <div className="mt-6 space-y-2.5 max-w-md" aria-hidden>
+                              <div className="rounded-2xl rounded-tr-sm bg-white/[0.07] border border-white/10 px-4 py-2.5 text-sm text-white/90 w-fit">
+                                בוקר טוב! 3 לידים חדשים מחכים לך 🔥
+                              </div>
+                              <div className="rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm font-semibold w-fit mr-auto" style={{ background: "var(--teal)", color: "var(--ink)" }}>
+                                תודה ספייק, מתחיל מהחם ביותר
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </Tilt>
+                    </div>
+                  </Reveal>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* ===== STATEMENT — full teal, the Iron Rule ===== */}
+        <section id="approvals" dir="rtl" className="zone-teal relative py-16 sm:py-28 px-4 sm:px-6 lg:px-12 overflow-hidden">
+          <div className="max-w-[1060px] mx-auto text-center relative">
+            <Reveal>
+              <div className="mb-6"><Sticker>ככה זה נראה במערכת</Sticker></div>
+              <h2 className="text-[clamp(2.6rem,7vw,5.4rem)] font-black leading-[1.02] tracking-[-0.035em] mb-5">
+                AI מסמן. <span className="hl">אתה מחליט.</span>
+              </h2>
+              <p className="text-base sm:text-xl text-soft leading-relaxed max-w-2xl mx-auto mb-10">
+                כל פעולה היא טיוטה שמחכה לך. מאשר בלחיצה - ואז נשלח. אף פעם לא אוטומטית, אף פעם לא בלי האישור שלך.
+              </p>
+            </Reveal>
+            <Reveal delay={0.1} className="-rotate-1">
+              <Tilt max={3} scale={1.006} outerClassName="[perspective:1400px]">
                 <BrowserFrame
+                  tone="light"
                   src="/shots/approvals.png"
                   alt="טיוטות פוסטים שהסוכן הכין, ממתינות לאישור או דחייה של בעל העסק"
                   width={1571}
                   height={1270}
                   label="app.spikeai.co.il/dashboard/approvals"
                 />
-                </Tilt>
-              </Reveal>
-            </div>
-          </section>
-        </div>
+              </Tilt>
+            </Reveal>
+          </div>
+        </section>
 
-        {/* ================= COLORFUL: VALUE / CTA STATEMENT (shader) ================= */}
-        <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden bg-black">
+        {/* ===== COLORFUL: SHADER CTA ===== */}
+        <section className="relative min-h-[78vh] flex items-center justify-center overflow-hidden bg-black">
           <div className="absolute inset-0 z-0">
             <WebGLShader />
           </div>
-          <div className="absolute inset-0 z-[1] pointer-events-none bg-gradient-to-b from-[#f5f5f7]/0 via-black/25 to-[#08090A]" />
+          <div className="absolute inset-0 z-[1] pointer-events-none bg-gradient-to-b from-transparent via-black/25 to-[#04100d]" />
 
           <div dir="rtl" className="relative z-10 text-center px-4 sm:px-6 py-24 max-w-3xl mx-auto">
             <div className="eyebrow mb-6 border-white/25 bg-white/10 text-white/90"><span>קבל הצעה</span></div>
@@ -1180,81 +1275,78 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ================= DARK: PRICING + FORM + FAQ + FOOTER ================= */}
-        <div dir="rtl" className="relative bg-[#08090A] text-white overflow-x-clip">
-          <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            <div className="ambient top-[200px] right-[-120px] w-[560px] h-[460px]" />
-            <div className="ambient top-[1700px] left-1/2 -translate-x-1/2 w-[900px] h-[520px]" />
-          </div>
+        {/* ===== PACKAGE — paper ticket on ink ===== */}
+        <section id="pricing" dir="rtl" className="zone-ink relative py-16 sm:py-28 px-4 sm:px-6 lg:px-12">
+          <div className="max-w-[1240px] mx-auto relative">
+            <Reveal className="text-center mb-12 sm:mb-16">
+              <div className="eyebrow mb-5"><span>החבילה</span></div>
+              <h2 className="text-[clamp(2rem,5vw,3.8rem)] font-black leading-[1.07] tracking-[-0.03em] mb-5">
+                חבילה אחת. <span className="hl">הכל כלול.</span>
+              </h2>
+              <p className="text-base sm:text-lg lg:text-xl text-[var(--text-2)] leading-relaxed max-w-2xl mx-auto">
+                בלי שדרוגים. בלי תוספות. בלי הפתעות בחשבון. כל הסוכנים, כל החיבורים, וכל ההתאמות - בחבילה אחת מותאמת לעסק שלך.
+              </p>
+            </Reveal>
 
-          {/* ===== PACKAGE ===== */}
-          <section id="pricing" className="relative py-16 sm:py-20 lg:py-32 px-4 sm:px-6 lg:px-12">
-            <div className="max-w-[1280px] mx-auto relative">
-              <Reveal className="text-center mb-12 sm:mb-16">
-                <div className="eyebrow mb-5"><span>החבילה</span></div>
-                <h2 className="text-3xl sm:text-4xl lg:text-6xl font-black leading-[1.08] tracking-[-0.035em] mb-5 sm:mb-6">
-                  חבילה אחת. <span className="sheen">הכל כלול.</span>
-                </h2>
-                <p className="text-base sm:text-lg lg:text-xl text-[var(--text-2)] leading-relaxed max-w-2xl mx-auto">
-                  בלי שדרוגים. בלי תוספות. בלי הפתעות בחשבון. כל הסוכנים, כל החיבורים, וכל ההתאמות - בחבילה אחת מותאמת לעסק שלך.
-                </p>
-              </Reveal>
-
-              <Reveal delay={0.1} className="glass rounded-2xl sm:rounded-[2rem] p-5 sm:p-8 lg:p-12 relative overflow-hidden">
-                <div className="relative z-10">
-                  <div className="text-center mb-8 sm:mb-12">
-                    <div className="inline-flex items-center gap-2 border border-white/15 bg-white/5 text-white font-semibold text-xs px-4 py-1.5 rounded-full mb-5 sm:mb-6">
-                      הכל כלול במחיר אחד
-                    </div>
-                    <h3 className="text-2xl sm:text-3xl lg:text-5xl font-black mb-3 sm:mb-4">החבילה המלאה</h3>
-                    <p className="text-base sm:text-lg text-[var(--text-2)] max-w-2xl mx-auto">
+            <Reveal delay={0.1}>
+              <div className="card-paper rounded-[2rem] overflow-hidden max-w-[1100px] mx-auto">
+                <div
+                  className="flex flex-wrap items-center justify-between gap-4 px-6 sm:px-10 py-6 sm:py-7"
+                  style={{ background: "linear-gradient(135deg, var(--teal-surface), var(--teal-surface-2))" }}
+                >
+                  <div className="text-right">
+                    <h3 className="text-2xl sm:text-4xl font-black text-[#04100d]">החבילה המלאה</h3>
+                    <p className="text-sm sm:text-base text-[#04100d]/75 mt-1 max-w-xl">
                       הצעה מותאמת אישית לעסק שלך. בשיחה איתנו נבין את הצרכים שלך ונבנה את החבילה הנכונה.
                     </p>
                   </div>
+                  <Sticker className="!rotate-2">הכל כלול במחיר אחד</Sticker>
+                </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 mb-8 sm:mb-12 items-stretch">
-                    <div className="glass spotlight-card rounded-2xl p-5 sm:p-6 order-2 md:order-1">
-                      <div className="flex items-center gap-3 mb-4 sm:mb-5 pb-3 sm:pb-4 border-b border-white/10">
+                <div className="p-5 sm:p-8 lg:p-10">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 mb-8 sm:mb-10 items-stretch">
+                    <div className="rounded-2xl border border-black/10 bg-black/[0.025] p-5 sm:p-6 order-2 md:order-1">
+                      <div className="flex items-center gap-3 mb-4 pb-3.5 border-b border-black/10">
                         <h4 className="text-base sm:text-lg font-bold">מתחבר ל-</h4>
                       </div>
                       <ul className="space-y-2.5 sm:space-y-3">
                         {packageIncludes.connections.map((item, i) => (
-                          <li key={i} className="flex items-start gap-2.5 text-sm text-white/85">
-                            <Check className="text-white mt-0.5 flex-shrink-0" />
+                          <li key={i} className="flex items-start gap-2.5 text-sm text-[#0a1411]/85">
+                            <Check className="text-[#0c7a63] mt-0.5 flex-shrink-0" />
                             <span>{item}</span>
                           </li>
                         ))}
                       </ul>
                     </div>
 
-                    <div className="edge-shimmer glass spotlight-card rounded-2xl p-5 sm:p-6 lg:p-7 order-1 md:order-2 relative bg-white/[0.06] md:scale-[1.04]">
-                      <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-white text-[#08090A] font-bold text-xs px-4 py-1.5 rounded-full whitespace-nowrap z-10">
-                        הלב של החבילה
+                    <div className="rounded-2xl border-2 border-[var(--teal)] bg-white p-5 sm:p-6 lg:p-7 order-1 md:order-2 relative md:scale-[1.04] shadow-[0_20px_50px_rgba(16,184,148,0.25)]">
+                      <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
+                        <Sticker className="sticker-teal !rotate-0 whitespace-nowrap">הלב של החבילה</Sticker>
                       </div>
-                      <div className="flex items-center gap-3 mb-4 sm:mb-5 pb-3 sm:pb-4 border-b border-white/15 mt-2">
+                      <div className="flex items-center gap-3 mb-4 pb-3.5 border-b border-black/10 mt-3">
                         <div>
                           <h4 className="text-lg sm:text-xl font-black">הסוכנים</h4>
-                          <p className="text-xs text-white/55">הצוות שעובד בשבילך 24/7</p>
+                          <p className="text-xs text-[#0a1411]/55">הצוות שעובד בשבילך 24/7</p>
                         </div>
                       </div>
                       <ul className="space-y-2.5 sm:space-y-3">
                         {packageIncludes.agents.map((item, i) => (
-                          <li key={i} className="flex items-start gap-2.5 text-sm text-white">
-                            <Check className="text-white mt-0.5 flex-shrink-0" />
+                          <li key={i} className="flex items-start gap-2.5 text-sm text-[#0a1411]">
+                            <Check className="text-[#0c7a63] mt-0.5 flex-shrink-0" />
                             <span>{item}</span>
                           </li>
                         ))}
                       </ul>
                     </div>
 
-                    <div className="glass spotlight-card rounded-2xl p-5 sm:p-6 order-3">
-                      <div className="flex items-center gap-3 mb-4 sm:mb-5 pb-3 sm:pb-4 border-b border-white/10">
+                    <div className="rounded-2xl border border-black/10 bg-black/[0.025] p-5 sm:p-6 order-3">
+                      <div className="flex items-center gap-3 mb-4 pb-3.5 border-b border-black/10">
                         <h4 className="text-base sm:text-lg font-bold">השירות</h4>
                       </div>
                       <ul className="space-y-2.5 sm:space-y-3">
                         {packageIncludes.service.map((item, i) => (
-                          <li key={i} className="flex items-start gap-2.5 text-sm text-white/85">
-                            <Check className="text-white mt-0.5 flex-shrink-0" />
+                          <li key={i} className="flex items-start gap-2.5 text-sm text-[#0a1411]/85">
+                            <Check className="text-[#0c7a63] mt-0.5 flex-shrink-0" />
                             <span>{item}</span>
                           </li>
                         ))}
@@ -1268,248 +1360,255 @@ export default function LandingPage() {
                       קבל הצעה אישית
                     </a>
                     </Magnetic>
-                    <p className="text-xs sm:text-sm text-white/45 mt-3 sm:mt-4">בלי התחייבות. בלי לחץ של מכירה.</p>
+                    <p className="text-xs sm:text-sm text-[#0a1411]/55 mt-3 sm:mt-4">בלי התחייבות. בלי לחץ של מכירה.</p>
                   </div>
                 </div>
-              </Reveal>
-            </div>
-          </section>
-
-          {/* ===== DETAILED FORM ===== */}
-          <section id="cta" className="relative py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-12">
-            <div className="max-w-[800px] mx-auto relative">
-              <Reveal className="text-center mb-8 sm:mb-12">
-                <div className="eyebrow mb-5"><span>קבל הצעה</span></div>
-                <h2 className="text-3xl sm:text-4xl lg:text-6xl font-black leading-[1.08] tracking-[-0.035em] mb-5 sm:mb-6">
-                  מוכן להתחיל? <span className="sheen">בוא נדבר.</span>
-                </h2>
-                <p className="text-base sm:text-lg lg:text-xl text-[var(--text-2)] leading-relaxed max-w-2xl mx-auto">
-                  השאר פרטים ונחזור אליך תוך 24 שעות עם הצעה אישית מותאמת לעסק שלך. בלי התחייבות, בלי לחץ.
-                </p>
-              </Reveal>
-
-              <Reveal delay={0.05} className="glass rounded-2xl sm:rounded-[2rem] p-5 sm:p-8 lg:p-12 relative overflow-hidden">
-                <div className="relative z-10">
-                  {!isSubmitted ? (
-                    <form onSubmit={handleSubmit} className="space-y-5">
-                      <div>
-                        <label htmlFor="name" className="block text-sm font-semibold mb-2 text-right text-white/90">שם מלא</label>
-                        <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} placeholder="ישראל ישראלי" required className="field px-5 py-4" />
-                      </div>
-                      <div>
-                        <label htmlFor="phone" className="block text-sm font-semibold mb-2 text-right text-white/90">טלפון</label>
-                        <input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleChange} placeholder="050-1234567" required className="field px-5 py-4" />
-                      </div>
-                      <div>
-                        <label htmlFor="email" className="block text-sm font-semibold mb-2 text-right text-white/90">אימייל</label>
-                        <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} placeholder="israel@example.com" required className="field px-5 py-4" />
-                      </div>
-                      <div>
-                        <label htmlFor="businessType" className="block text-sm font-semibold mb-2 text-right text-white/90">תחום העסק</label>
-                        <select id="businessType" name="businessType" value={formData.businessType} onChange={handleChange} required className="field field-select px-5 py-4">
-                          <option value="">בחר תחום</option>
-                          <option value="service">💼 עסק שירות (קליניקה, מספרה, מאמן)</option>
-                          <option value="sales">🛒 עסק מכירות (חנות, סוכן, ביטוח)</option>
-                          <option value="real-estate">🏠 נדל&quot;ן</option>
-                          <option value="online">🛍️ חנות אונליין</option>
-                          <option value="consulting">💡 ייעוץ / טיפול</option>
-                          <option value="dental">🦷 רפואת שיניים / אסתטיקה</option>
-                          <option value="fitness">🏋️ כושר / יוגה / פילאטיס</option>
-                          <option value="nutrition">🥗 תזונה / דיאטנית</option>
-                          <option value="psychology">🧠 פסיכולוג / מטפל</option>
-                          <option value="spa">💆 ספא / טיפוח</option>
-                          <option value="education">🎓 קורסים / הדרכה</option>
-                          <option value="restaurant">🍔 מסעדה / קייטרינג</option>
-                          <option value="auto">🚗 מוסך / רכב</option>
-                          <option value="construction">🏗️ שיפוצים / קבלן</option>
-                          <option value="creative">🎨 שירותים יצירתיים (צילום, עיצוב)</option>
-                          <option value="other">❓ אחר</option>
-                        </select>
-                      </div>
-
-                      {/* === צ'קבוקסי הסכמה משפטית === */}
-                      <div className="space-y-1 pt-2">
-                        <label className="flex items-start gap-2.5 py-2.5 cursor-pointer select-none">
-                          <input
-                            type="checkbox"
-                            checked={agreedToTerms}
-                            onChange={(e) => setAgreedToTerms(e.target.checked)}
-                            required
-                            aria-label="אישור מדיניות הפרטיות ותנאי השימוש (חובה)"
-                            className="consent-box"
-                          />
-                          <span className="text-[13px] leading-relaxed text-white/70 flex-1">
-                            <span className="text-white/90 font-semibold text-[11px] ml-1">חובה</span>
-                            קראתי את{" "}
-                            <Link href="/privacy" target="_blank" rel="noopener" className="text-white underline underline-offset-2 hover:text-white/80">מדיניות הפרטיות</Link>
-                            {" "}ואת{" "}
-                            <Link href="/terms" target="_blank" rel="noopener" className="text-white underline underline-offset-2 hover:text-white/80">תנאי השימוש</Link>
-                            {" "}ואני מסכים/ה להם.
-                          </span>
-                        </label>
-
-                        <label className="flex items-start gap-2.5 py-2.5 cursor-pointer select-none">
-                          <input
-                            type="checkbox"
-                            checked={agreedToMarketing}
-                            onChange={(e) => setAgreedToMarketing(e.target.checked)}
-                            aria-label="אישור קבלת חומר שיווקי (אופציונלי)"
-                            className="consent-box"
-                          />
-                          <span className="text-[13px] leading-relaxed text-white/70 flex-1">
-                            <span className="text-white/40 font-medium text-[11px] ml-1">אופציונלי</span>
-                            אני מאשר/ת לקבל חומר שיווקי, עדכונים והצעות בדוא&quot;ל ובהודעות.
-                          </span>
-                        </label>
-                      </div>
-
-                      {submitError && (
-                        <div className="rounded-xl border border-white/25 bg-white/5 px-4 py-3 text-sm text-white/90 text-center">{submitError}</div>
-                      )}
-
-                      <button type="submit" disabled={isSubmitting || !agreedToTerms} className="w-full btn-primary px-8 py-5 text-lg">
-                        {isSubmitting ? "שולח..." : "שלח ובוא נדבר"}
-                      </button>
-
-                      <p className="text-xs text-white/45 text-center mt-4">הפרטים שלך מוגנים. אנחנו לא משתפים אותם עם אף אחד.</p>
-                    </form>
-                  ) : (
-                    <div className="text-center py-8">
-                      <h3 className="text-3xl lg:text-4xl font-black mb-4">תודה <span className="sheen">{formData.name}!</span></h3>
-                      <p className="text-lg text-white/85 mb-2">קיבלנו את הפרטים שלך.</p>
-                      <p className="text-base text-[var(--text-2)] mb-8">נחזור אליך תוך 24 שעות עם הצעה אישית מותאמת לעסק שלך.</p>
-                      <div className="inline-flex items-center gap-2 border border-white/15 bg-white/5 rounded-full px-4 py-2 text-sm text-white/80">
-                        <span>תקבל אישור באימייל</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </Reveal>
-
-              <div className="mt-10 flex flex-wrap justify-center gap-x-8 gap-y-4 text-sm text-white/55">
-                <span className="flex items-center gap-2"><Check className="text-white" /><span>תגובה תוך 24 שעות</span></span>
-                <span className="flex items-center gap-2"><Check className="text-white" /><span>בלי התחייבות</span></span>
-                <span className="flex items-center gap-2"><Check className="text-white" /><span>שירות בעברית</span></span>
               </div>
-            </div>
-          </section>
+            </Reveal>
+          </div>
+        </section>
 
-          {/* ===== FAQ ===== */}
-          <section id="faq" className="relative py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-12">
-            <div className="max-w-[900px] mx-auto relative">
-              <Reveal className="text-center mb-12 sm:mb-16">
-                <div className="eyebrow mb-5"><span>שאלות נפוצות</span></div>
-                <h2 className="text-3xl sm:text-4xl lg:text-6xl font-black leading-[1.08] tracking-[-0.035em] mb-5 sm:mb-6">
-                  יש לך שאלות? <span className="sheen">יש לנו תשובות.</span>
-                </h2>
-                <p className="text-base sm:text-lg lg:text-xl text-[var(--text-2)] leading-relaxed max-w-2xl mx-auto">
-                  התשובות לשאלות הנפוצות שאנחנו מקבלים. אם משהו לא ברור - תמיד אפשר לפנות אלינו.
-                </p>
-              </Reveal>
+        {/* ===== DETAILED FORM ===== */}
+        <section id="cta" dir="rtl" className="zone-ink relative py-16 sm:py-24 px-4 sm:px-6 lg:px-12">
+          <div className="max-w-[800px] mx-auto relative">
+            <Reveal className="text-center mb-8 sm:mb-12">
+              <div className="eyebrow mb-5"><span>קבל הצעה</span></div>
+              <h2 className="text-[clamp(2rem,5vw,3.8rem)] font-black leading-[1.07] tracking-[-0.03em] mb-5">
+                מוכן להתחיל? <span className="hl">בוא נדבר.</span>
+              </h2>
+              <p className="text-base sm:text-lg lg:text-xl text-[var(--text-2)] leading-relaxed max-w-2xl mx-auto">
+                השאר פרטים ונחזור אליך תוך 24 שעות עם הצעה אישית מותאמת לעסק שלך. בלי התחייבות, בלי לחץ.
+              </p>
+            </Reveal>
 
-              <div className="space-y-3 sm:space-y-4">
-                {faqs.map((faq, index) => {
-                  const open = openFaq === index;
-                  return (
-                    <div key={index} className={`glass rounded-xl sm:rounded-2xl overflow-hidden ${open ? "border-white/25 bg-white/[0.06]" : ""}`}>
-                      <button
-                        className="w-full px-5 sm:px-7 py-4 sm:py-6 text-right flex justify-between items-center gap-4 cursor-pointer"
-                        onClick={() => toggleFaq(index)}
-                        aria-expanded={open}
-                      >
-                        <span className="text-sm sm:text-base lg:text-lg font-bold text-right flex-1">{faq.question}</span>
-                        <span
-                          className={`flex-shrink-0 w-8 h-8 rounded-full border border-white/20 bg-white/5 flex items-center justify-center text-lg font-light text-white transition-transform duration-300 ${open ? "rotate-45" : ""}`}
-                          aria-hidden
-                        >
-                          +
+            <Reveal delay={0.05} className="card-live glass rounded-[2rem] p-5 sm:p-8 lg:p-12 relative">
+              <div className="relative z-10">
+                {!isSubmitted ? (
+                  <form onSubmit={handleSubmit} className="space-y-5">
+                    <div>
+                      <label htmlFor="name" className="block text-sm font-semibold mb-2 text-right text-white/90">שם מלא</label>
+                      <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} placeholder="ישראל ישראלי" required className="field px-5 py-4" />
+                    </div>
+                    <div>
+                      <label htmlFor="phone" className="block text-sm font-semibold mb-2 text-right text-white/90">טלפון</label>
+                      <input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleChange} placeholder="050-1234567" required className="field px-5 py-4" />
+                    </div>
+                    <div>
+                      <label htmlFor="email" className="block text-sm font-semibold mb-2 text-right text-white/90">אימייל</label>
+                      <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} placeholder="israel@example.com" required className="field px-5 py-4" />
+                    </div>
+                    <div>
+                      <label htmlFor="businessType" className="block text-sm font-semibold mb-2 text-right text-white/90">תחום העסק</label>
+                      <select id="businessType" name="businessType" value={formData.businessType} onChange={handleChange} required className="field field-select px-5 py-4">
+                        <option value="">בחר תחום</option>
+                        <option value="service">💼 עסק שירות (קליניקה, מספרה, מאמן)</option>
+                        <option value="sales">🛒 עסק מכירות (חנות, סוכן, ביטוח)</option>
+                        <option value="real-estate">🏠 נדל&quot;ן</option>
+                        <option value="online">🛍️ חנות אונליין</option>
+                        <option value="consulting">💡 ייעוץ / טיפול</option>
+                        <option value="dental">🦷 רפואת שיניים / אסתטיקה</option>
+                        <option value="fitness">🏋️ כושר / יוגה / פילאטיס</option>
+                        <option value="nutrition">🥗 תזונה / דיאטנית</option>
+                        <option value="psychology">🧠 פסיכולוג / מטפל</option>
+                        <option value="spa">💆 ספא / טיפוח</option>
+                        <option value="education">🎓 קורסים / הדרכה</option>
+                        <option value="restaurant">🍔 מסעדה / קייטרינג</option>
+                        <option value="auto">🚗 מוסך / רכב</option>
+                        <option value="construction">🏗️ שיפוצים / קבלן</option>
+                        <option value="creative">🎨 שירותים יצירתיים (צילום, עיצוב)</option>
+                        <option value="other">❓ אחר</option>
+                      </select>
+                    </div>
+
+                    {/* === Legal consent checkboxes (Amendment 13) === */}
+                    <div className="space-y-1 pt-2">
+                      <label className="flex items-start gap-2.5 py-2.5 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={agreedToTerms}
+                          onChange={(e) => setAgreedToTerms(e.target.checked)}
+                          required
+                          aria-label="אישור מדיניות הפרטיות ותנאי השימוש (חובה)"
+                          className="consent-box"
+                        />
+                        <span className="text-[13px] leading-relaxed text-white/70 flex-1">
+                          <span className="text-white/90 font-semibold text-[11px] ml-1">חובה</span>
+                          קראתי את{" "}
+                          <Link href="/privacy" target="_blank" rel="noopener" className="text-white underline underline-offset-2 hover:text-white/80">מדיניות הפרטיות</Link>
+                          {" "}ואת{" "}
+                          <Link href="/terms" target="_blank" rel="noopener" className="text-white underline underline-offset-2 hover:text-white/80">תנאי השימוש</Link>
+                          {" "}ואני מסכים/ה להם.
                         </span>
-                      </button>
-                      <AnimatePresence initial={false}>
-                        {open && (
-                          <motion.div
-                            key="answer"
-                            initial={reduceMotion ? false : { height: 0, opacity: 0 }}
-                            animate={{ height: "auto", opacity: 1 }}
-                            exit={reduceMotion ? undefined : { height: 0, opacity: 0 }}
-                            transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
-                            className="overflow-hidden"
-                          >
-                            <div className="px-5 sm:px-7 pb-5 sm:pb-6 text-sm lg:text-base text-[var(--text-2)] leading-relaxed text-right">
-                              {faq.answer}
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  );
-                })}
-              </div>
+                      </label>
 
-              <div className="text-center mt-10 sm:mt-12">
-                <p className="text-sm sm:text-base text-white/55 mb-3 sm:mb-4">יש לך שאלה אחרת?</p>
-                <a href="#cta" className="inline-flex btn-ghost px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base">בוא נדבר ←</a>
-              </div>
-            </div>
-          </section>
-
-          {/* ===== FOOTER ===== */}
-          <footer className="relative border-t border-white/10 bg-[#08090A]/60 backdrop-blur-md mt-12">
-            <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-12 py-10 sm:py-14 relative">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 md:gap-8 mb-8 sm:mb-10">
-                <div className="text-center md:text-right">
-                  <div className="flex items-center gap-3 mb-4 justify-center md:justify-start">
-                    <div className="relative w-10 h-10">
-                      <Image src="/spike-mascot.png" alt="Spike AI" fill sizes="40px" className="object-contain mascot-mono" />
+                      <label className="flex items-start gap-2.5 py-2.5 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={agreedToMarketing}
+                          onChange={(e) => setAgreedToMarketing(e.target.checked)}
+                          aria-label="אישור קבלת חומר שיווקי (אופציונלי)"
+                          className="consent-box"
+                        />
+                        <span className="text-[13px] leading-relaxed text-white/70 flex-1">
+                          <span className="text-white/40 font-medium text-[11px] ml-1">אופציונלי</span>
+                          אני מאשר/ת לקבל חומר שיווקי, עדכונים והצעות בדוא&quot;ל ובהודעות.
+                        </span>
+                      </label>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-grotesk text-xl font-bold tracking-tight">Spike AI</span>
-                      <span className="font-grotesk text-[10px] font-medium tracking-[0.25em] text-white/70 border border-white/15 px-2 py-0.5 rounded-full">
-                        AGENTS
-                      </span>
+
+                    {submitError && (
+                      <div className="rounded-xl border border-white/25 bg-white/5 px-4 py-3 text-sm text-white/90 text-center">{submitError}</div>
+                    )}
+
+                    <button type="submit" disabled={isSubmitting || !agreedToTerms} className="w-full btn-primary px-8 py-5 text-lg">
+                      {isSubmitting ? "שולח..." : "שלח ובוא נדבר"}
+                    </button>
+
+                    <p className="text-xs text-white/45 text-center mt-4">הפרטים שלך מוגנים. אנחנו לא משתפים אותם עם אף אחד.</p>
+                  </form>
+                ) : (
+                  <div className="text-center py-8">
+                    <h3 className="text-3xl lg:text-4xl font-black mb-4">תודה <span className="hl">{formData.name}!</span></h3>
+                    <p className="text-lg text-white/85 mb-2">קיבלנו את הפרטים שלך.</p>
+                    <p className="text-base text-[var(--text-2)] mb-8">נחזור אליך תוך 24 שעות עם הצעה אישית מותאמת לעסק שלך.</p>
+                    <div className="inline-flex items-center gap-2 border border-white/15 bg-white/5 rounded-full px-4 py-2 text-sm text-white/80">
+                      <span>תקבל אישור באימייל</span>
                     </div>
                   </div>
-                  <p className="text-sm text-white/55 leading-relaxed max-w-xs mx-auto md:mx-0">
-                    צוות שעובד בשבילך, בלי לבקש משכורת.
-                  </p>
-                </div>
+                )}
+              </div>
+            </Reveal>
 
-                <div className="text-center md:text-right">
-                  <h4 className="text-sm font-bold text-white/90 mb-4 tracking-wide">ניווט</h4>
-                  <ul className="space-y-2.5">
-                    <li><a href="#how" className="text-sm text-white/55 hover:text-white transition-colors">איך זה עובד</a></li>
-                    <li><a href="#agents" className="text-sm text-white/55 hover:text-white transition-colors">סוכנים</a></li>
-                    <li><a href="#pricing" className="text-sm text-white/55 hover:text-white transition-colors">החבילה</a></li>
-                    <li><a href="#faq" className="text-sm text-white/55 hover:text-white transition-colors">שאלות נפוצות</a></li>
-                  </ul>
-                </div>
+            <div className="mt-10 flex flex-wrap justify-center gap-x-8 gap-y-4 text-sm text-white/55">
+              <span className="flex items-center gap-2"><Check className="text-[var(--teal-soft)]" /><span>תגובה תוך 24 שעות</span></span>
+              <span className="flex items-center gap-2"><Check className="text-[var(--teal-soft)]" /><span>בלי התחייבות</span></span>
+              <span className="flex items-center gap-2"><Check className="text-[var(--teal-soft)]" /><span>שירות בעברית</span></span>
+            </div>
+          </div>
+        </section>
 
-                <div className="text-center md:text-right">
-                  <h4 className="text-sm font-bold text-white/90 mb-4 tracking-wide">מידע משפטי</h4>
-                  <ul className="space-y-2.5">
-                    <li><Link href="/privacy" className="text-sm text-white/55 hover:text-white transition-colors">מדיניות פרטיות</Link></li>
-                    <li><Link href="/terms" className="text-sm text-white/55 hover:text-white transition-colors">תנאי שימוש</Link></li>
-                    <li><Link href="/cookies" className="text-sm text-white/55 hover:text-white transition-colors">מדיניות עוגיות</Link></li>
-                    <li><Link href="/accessibility" className="text-sm text-white/55 hover:text-white transition-colors">הצהרת נגישות</Link></li>
-                  </ul>
-                </div>
+        {/* ===== FAQ ===== */}
+        <section id="faq" dir="rtl" className="zone-ink relative py-16 sm:py-24 px-4 sm:px-6 lg:px-12">
+          <div className="max-w-[900px] mx-auto relative">
+            <Reveal className="text-center mb-12 sm:mb-16">
+              <div className="eyebrow mb-5"><span>שאלות נפוצות</span></div>
+              <h2 className="text-[clamp(2rem,5vw,3.8rem)] font-black leading-[1.07] tracking-[-0.03em] mb-5">
+                יש לך שאלות? <span className="hl">יש לנו תשובות.</span>
+              </h2>
+              <p className="text-base sm:text-lg lg:text-xl text-[var(--text-2)] leading-relaxed max-w-2xl mx-auto">
+                התשובות לשאלות הנפוצות שאנחנו מקבלים. אם משהו לא ברור - תמיד אפשר לפנות אלינו.
+              </p>
+            </Reveal>
 
-                <div className="text-center md:text-right">
-                  <h4 className="text-sm font-bold text-white/90 mb-4 tracking-wide">יצירת קשר</h4>
-                  <a href="mailto:spikeaistudio@gmail.com" className="inline-flex items-center gap-2 text-sm text-white/55 hover:text-white transition-colors" dir="ltr">
-                    <span>spikeaistudio@gmail.com</span>
-                  </a>
-                  <p className="text-xs text-white/40 mt-3 leading-relaxed">נחזור אליך תוך 24 שעות</p>
+            <div className="space-y-3 sm:space-y-4">
+              {faqs.map((faq, index) => {
+                const open = openFaq === index;
+                return (
+                  <div key={index} className={`glass rounded-2xl overflow-hidden ${open ? "border-white/25 bg-white/[0.06]" : ""}`}>
+                    <button
+                      className="w-full px-5 sm:px-7 py-4 sm:py-6 text-right flex items-center gap-4 cursor-pointer"
+                      onClick={() => toggleFaq(index)}
+                      aria-expanded={open}
+                    >
+                      <span className="font-grotesk text-sm text-[var(--teal-soft)]/70 w-7 flex-shrink-0" aria-hidden>
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                      <span className="text-sm sm:text-base lg:text-lg font-bold text-right flex-1">{faq.question}</span>
+                      <span
+                        className={`flex-shrink-0 w-8 h-8 rounded-full border border-white/20 bg-white/5 flex items-center justify-center text-lg font-light text-white transition-transform duration-300 ${open ? "rotate-45" : ""}`}
+                        aria-hidden
+                      >
+                        +
+                      </span>
+                    </button>
+                    <AnimatePresence initial={false}>
+                      {open && (
+                        <motion.div
+                          key="answer"
+                          initial={reduceMotion ? false : { height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={reduceMotion ? undefined : { height: 0, opacity: 0 }}
+                          transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
+                          className="overflow-hidden"
+                        >
+                          <div className="px-5 sm:px-7 pb-5 sm:pb-6 text-sm lg:text-base text-[var(--text-2)] leading-relaxed text-right">
+                            {faq.answer}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="text-center mt-10 sm:mt-12">
+              <p className="text-sm sm:text-base text-white/55 mb-3 sm:mb-4">יש לך שאלה אחרת?</p>
+              <a href="#cta" className="inline-flex btn-ghost px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base">בוא נדבר ←</a>
+            </div>
+          </div>
+        </section>
+
+        {/* ===== FOOTER ===== */}
+        <footer dir="rtl" className="zone-ink relative border-t border-white/10 mt-8 overflow-hidden">
+          <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-12 py-10 sm:py-14 relative">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 md:gap-8 mb-8 sm:mb-10">
+              <div className="text-center md:text-right">
+                <div className="flex items-center gap-3 mb-4 justify-center md:justify-start">
+                  <div className="relative w-10 h-10">
+                    <Image src="/spike-mascot.png" alt="Spike AI" fill sizes="40px" className="object-contain mascot-mono" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-grotesk text-xl font-bold tracking-tight">Spike AI</span>
+                    <span className="font-grotesk text-[10px] font-medium tracking-[0.25em] text-[var(--teal-soft)] border border-[rgba(22,211,171,0.35)] px-2 py-0.5 rounded-full">
+                      AGENTS
+                    </span>
+                  </div>
                 </div>
+                <p className="text-sm text-white/55 leading-relaxed max-w-xs mx-auto md:mx-0">
+                  צוות שעובד בשבילך, בלי לבקש משכורת.
+                </p>
               </div>
 
-              <div className="pt-8 border-t border-white/5 text-center space-y-2">
-                <p className="text-xs text-white/35">כל התצוגות באתר להמחשה בלבד · הנתונים והשמות לדוגמה ואינם לקוחות אמיתיים.</p>
-                <p className="text-xs text-white/40">© 2026 Spike AI Agents. כל הזכויות שמורות.</p>
+              <div className="text-center md:text-right">
+                <h4 className="text-sm font-bold text-white/90 mb-4 tracking-wide">ניווט</h4>
+                <ul className="space-y-2.5">
+                  <li><a href="#how" className="text-sm text-white/55 hover:text-white transition-colors">איך זה עובד</a></li>
+                  <li><a href="#agents" className="text-sm text-white/55 hover:text-white transition-colors">סוכנים</a></li>
+                  <li><a href="#pricing" className="text-sm text-white/55 hover:text-white transition-colors">החבילה</a></li>
+                  <li><a href="#faq" className="text-sm text-white/55 hover:text-white transition-colors">שאלות נפוצות</a></li>
+                </ul>
+              </div>
+
+              <div className="text-center md:text-right">
+                <h4 className="text-sm font-bold text-white/90 mb-4 tracking-wide">מידע משפטי</h4>
+                <ul className="space-y-2.5">
+                  <li><Link href="/privacy" className="text-sm text-white/55 hover:text-white transition-colors">מדיניות פרטיות</Link></li>
+                  <li><Link href="/terms" className="text-sm text-white/55 hover:text-white transition-colors">תנאי שימוש</Link></li>
+                  <li><Link href="/cookies" className="text-sm text-white/55 hover:text-white transition-colors">מדיניות עוגיות</Link></li>
+                  <li><Link href="/accessibility" className="text-sm text-white/55 hover:text-white transition-colors">הצהרת נגישות</Link></li>
+                </ul>
+              </div>
+
+              <div className="text-center md:text-right">
+                <h4 className="text-sm font-bold text-white/90 mb-4 tracking-wide">יצירת קשר</h4>
+                <a href="mailto:spikeaistudio@gmail.com" className="inline-flex items-center gap-2 text-sm text-white/55 hover:text-white transition-colors" dir="ltr">
+                  <span>spikeaistudio@gmail.com</span>
+                </a>
+                <p className="text-xs text-white/40 mt-3 leading-relaxed">נחזור אליך תוך 24 שעות</p>
               </div>
             </div>
-          </footer>
-        </div>
+
+            <div aria-hidden className="pointer-events-none select-none font-grotesk font-bold text-white/[0.045] text-[17vw] leading-[0.8] text-center -mb-[2vw]" dir="ltr">
+              SPIKE
+            </div>
+
+            <div className="pt-8 border-t border-white/5 text-center space-y-2 relative">
+              <p className="text-xs text-white/35">כל התצוגות באתר להמחשה בלבד · הנתונים והשמות לדוגמה ואינם לקוחות אמיתיים.</p>
+              <p className="text-xs text-white/40">© 2026 Spike AI Agents. כל הזכויות שמורות.</p>
+            </div>
+          </div>
+        </footer>
 
         {/* ===== Sticky mobile CTA ===== */}
         <a href="#cta" className="sm:hidden fixed bottom-4 inset-x-4 z-50 btn-primary py-3.5 text-base shadow-2xl">
