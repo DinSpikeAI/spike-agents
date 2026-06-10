@@ -798,6 +798,7 @@ export default function LandingPage() {
                   height={1162}
                   label="app.spikeai.co.il/dashboard/showcase"
                 />
+                <p className="mt-3 text-center text-xs text-white/35">להמחשה · נתוני דמו</p>
               </Reveal>
             </div>
           </section>
@@ -1219,7 +1220,8 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              <div className="pt-8 border-t border-white/5 text-center">
+              <div className="pt-8 border-t border-white/5 text-center space-y-2">
+                <p className="text-xs text-white/35">כל התצוגות באתר להמחשה בלבד · הנתונים והשמות לדוגמה ואינם לקוחות אמיתיים.</p>
                 <p className="text-xs text-white/40">© 2026 Spike AI Agents. כל הזכויות שמורות.</p>
               </div>
             </div>
